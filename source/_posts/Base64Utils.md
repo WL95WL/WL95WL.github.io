@@ -1,7 +1,7 @@
 ---
 title: Base64Utils
 date: 2019-09-26 09:23:29
-tags:java
+tags: java
 ---
 
 ````java
@@ -149,10 +149,8 @@ public class NetToBase64 {
     }
 
 }
-
+ 
 ````
-
-### base64util
 
 
 
