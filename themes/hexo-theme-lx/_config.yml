@@ -10,7 +10,7 @@ favicon: /favicon.ico
 avatar: /images/person_1.jpg
 
 # 侧边栏个人信息
-personal_des: Hello, World!
+personal_des: Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride
 
 # 首页封面
 cover: /images/cover.jpg
@@ -60,7 +60,7 @@ social:
 
 # 本地搜索#使用请先安装插件'npm install hexo-generator-searchdb -s'
 local_search:
-  enable: false
+  enable: true
   trigger: auto #'auto'自动显示搜索结果 or 'manual'手动显示搜索结果 
   top_n_per_article: 1
   unescape: false
@@ -76,7 +76,7 @@ baidu_analytics: #百度统计ID
 
 # 评论系统使用valine,appid和appkey在leancloud创建应用后获取。
 comment:
-  enable: false
+  enable: true
   appid:
   appkey:
   notify: false
