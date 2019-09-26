@@ -77,8 +77,8 @@ baidu_analytics: #百度统计ID
 # 评论系统使用valine,appid和appkey在leancloud创建应用后获取。
 comment:
   enable: true
-  appid:
-  appkey:
+  appid: YFLRL95mJxOLxyHI5EKXlr4Q-gzGzoHsz
+  appkey: FO7iHJSy5vVqCIW3goFYWD5x
   notify: false
   verify: false
   placeholder: 此处留言
