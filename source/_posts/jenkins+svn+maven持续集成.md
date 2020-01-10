@@ -54,7 +54,7 @@ test2=123456
 
 上面的例子中我们创建了2个用户，一个test1，一个test2
 
-![img](https://images2015.cnblogs.com/blog/352797/201603/352797-20160311222507507-2034382814.png)
+![](E:\hexo\gitHexo\WL95WL.github.io\public\images\jenkins\1.jpg)
 
 ## 2.3. 配置authz
 
