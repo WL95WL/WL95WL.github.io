@@ -54,7 +54,7 @@ test2=123456
 
 上面的例子中我们创建了2个用户，一个test1，一个test2
 
-![](jenkins-svn-maven持续集成\1.jpg)
+![](jenkins-svn-maven持续集成/1.jpg)
 
 ## 2.3. 配置authz
 
@@ -69,7 +69,7 @@ test2=r
 
 上面配置的含义是，`liuxianan`对`/home/svn/`下所有文件具有可读可写权限，`test`只有只读权限，除此之外，其它用户均无任何权限，最后一行`*=`很重要不能少。
 
-![img](jenkins-svn-maven持续集成\2.png)
+![img](jenkins-svn-maven持续集成/2.png)
 
 ### 2.3.1. 拓展：使用用户分组
 
@@ -114,7 +114,7 @@ realm = /home/svn # 认证空间名，版本库所在目录
 - 最后一行的realm记得改成你的svn目录
 - 打开注释时切记前面**不要留有空格**，否则可能有问题（网上说的，我没有亲测）
 
-![img](jenkins-svn-maven持续集成\3.png)
+![img](jenkins-svn-maven持续集成/3.png)
 
 # 启动与停止
 
@@ -132,11 +132,11 @@ root      4949  4822  0 22:05 pts/0    00:00:00 grep svnserve
 [root@localhost conf]# kill -9 4908
 ```
 
-![img](jenkins-svn-maven持续集成\4.png)
+![img](jenkins-svn-maven持续集成/4.png)
 
 最后来个总的截图：
 
-![img](jenkins-svn-maven持续集成\5.png)
+![img](jenkins-svn-maven持续集成/5.png)
 
 # 客户端连接
 
@@ -144,7 +144,7 @@ root      4949  4822  0 22:05 pts/0    00:00:00 grep svnserve
 
 默认端口3690，如果你修改了端口，那么要记得加上端口号。
 
-![img](jenkins-svn-maven持续集成\6.png)
+![img](jenkins-svn-maven持续集成/6.png)
 
 # 二、安装maven
 
