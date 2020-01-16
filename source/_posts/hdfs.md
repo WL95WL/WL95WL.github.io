@@ -1,5 +1,5 @@
 ---
-title: 大数据
+title: hdfs
 date: 2020-01-13 15:28:27
 tags: bigdata
 comment: true
