@@ -1,7 +1,7 @@
 ---
-title: hdfs
-date: 2020-01-13 15:28:27
-tags: bigdata
+title: hadoop之hdfs
+date: 2020-01-16 15:30:53
+tags: hadoop
 comment: true
 ---
 
@@ -30,7 +30,7 @@ comment: true
 > ```shel
 > [root@CentOS ~]# hdfs dfsadmin -printTopology  查看机架
 > Rack: /default-rack
->    192.168.169.139:50010 (CentOS)
+> 192.168.169.139:50010 (CentOS)
 > 
 > ```
 >
@@ -45,8 +45,12 @@ comment: true
 >
 > *NameNode和Secondary Namenode的关系?*
 >
-> ![](C:\Users\LiWang\Desktop\YDML7~17A$WA9U8~YT{H%0L.png)
+> ![](hadoop之hdfs/secondary.png)
 >
+> > fsimage 文件镜像
+> >
+> > edits 日志文件
+> >
 > > 辅助NameNode整理Edits和Fsimage文件,加速NameNode启动过程.
 > >
 > > <https://blog.csdn.net/WYpersist/article/details/79840776>
@@ -313,8 +317,8 @@ comment: true
 >
 > ```xml
 > <property>
->         <name>fs.trash.interval</name>
->         <value>1</value>
+>      <name>fs.trash.interval</name>
+>      <value>1</value>
 > </property>
 > 
 > ```
@@ -337,21 +341,21 @@ comment: true
 >
 > ```xml
 > <dependency>
->     <groupId>org.apache.hadoop</groupId>
->     <artifactId>hadoop-hdfs</artifactId>
->     <version>2.6.0</version>
+>  <groupId>org.apache.hadoop</groupId>
+>  <artifactId>hadoop-hdfs</artifactId>
+>  <version>2.6.0</version>
 > </dependency>
 > 
 > <dependency>
->     <groupId>org.apache.hadoop</groupId>
->     <artifactId>hadoop-common</artifactId>
->     <version>2.6.0</version>
+>  <groupId>org.apache.hadoop</groupId>
+>  <artifactId>hadoop-common</artifactId>
+>  <version>2.6.0</version>
 > </dependency>
 > 
 > <dependency>
->     <groupId>junit</groupId>
->     <artifactId>junit</artifactId>
->     <version>4.12</version>
+>  <groupId>junit</groupId>
+>  <artifactId>junit</artifactId>
+>  <version>4.12</version>
 > </dependency>
 > 
 > ```
@@ -389,8 +393,8 @@ comment: true
 >
 > ```xml
 > <property>
->         <name>dfs.permissions.enabled</name>
->         <value>false</value>
+>      <name>dfs.permissions.enabled</name>
+>      <value>false</value>
 > </property>
 > 
 > ```
@@ -401,6 +405,7 @@ comment: true
 >
 > ```shell
 > -DHADOOP_USER_NAME=root
+> 
 > 
 > ```
 >
@@ -418,104 +423,105 @@ comment: true
 > import java.io.*;
 > 
 > public class TestHDFSDemo {
->     private FileSystem fileSystem;
->     private Configuration conf;
->     @Before
->     public void before() throws IOException {
->         conf=new Configuration();
->         conf.addResource("core-site.xml");
->         conf.addResource("hdfs-site.xml");
->         fileSystem=FileSystem.newInstance(conf);
->     }
+>  private FileSystem fileSystem;
+>  private Configuration conf;
+>  @Before
+>  public void before() throws IOException {
+>      conf=new Configuration();
+>      conf.addResource("core-site.xml");
+>      conf.addResource("hdfs-site.xml");
+>      fileSystem=FileSystem.newInstance(conf);
+>  }
 > 
->     @Test
->     public void testConfig(){
->         String value = conf.get("dfs.replication");
->         System.out.println(value);
->     }
+>  @Test
+>  public void testConfig(){
+>      String value = conf.get("dfs.replication");
+>      System.out.println(value);
+>  }
 > 
->     @Test
->     public void testUpload01() throws IOException {
->         String file="C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理.pdf";
->         Path dst=new Path("/demo/access/springBoot.pdf");
->         InputStream is  = new FileInputStream(file);
->         OutputStream os = fileSystem.create(dst, new Progressable() {
->             public void progress() {
->                 System.out.print(".");
->             }
->         });
->         IOUtils.copyBytes(is,os,1024,true);
->     }
->     @Test
->     public void testUpload02() throws IOException {
->         Path src=new Path("C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理.pdf");
->         Path dst=new Path("/springBoot1.pdf");
->         fileSystem.copyFromLocalFile(src,dst);
->     }
+>  @Test
+>  public void testUpload01() throws IOException {
+>      String file="C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理.pdf";
+>      Path dst=new Path("/demo/access/springBoot.pdf");
+>      InputStream is  = new FileInputStream(file);
+>      OutputStream os = fileSystem.create(dst, new Progressable() {
+>          public void progress() {
+>              System.out.print(".");
+>          }
+>      });
+>      IOUtils.copyBytes(is,os,1024,true);
+>  }
+>  @Test
+>  public void testUpload02() throws IOException {
+>      Path src=new Path("C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理.pdf");
+>      Path dst=new Path("/springBoot1.pdf");
+>      fileSystem.copyFromLocalFile(src,dst);
+>  }
 > 
->     @Test
->     public void testDownload01() throws IOException {
->         String file="C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理1.pdf";
->         Path dst=new Path("/springBoot.pdf");
->         OutputStream os  = new FileOutputStream(file);
->         InputStream is = fileSystem.open(dst);
->         IOUtils.copyBytes(is,os,1024,true);
->     }
->     @Test
->     public void testDownload02() throws IOException {
->         Path dst=new Path("C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理3.pdf");
->         Path src=new Path("/springBoot1.pdf");
->         //fileSystem.copyToLocalFile(src,dst);
->         fileSystem.copyToLocalFile(false,src,dst,true);
->     }
->     @Test
->     public void testDelete() throws IOException {
->         Path src=new Path("/user");
+>  @Test
+>  public void testDownload01() throws IOException {
+>      String file="C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理1.pdf";
+>      Path dst=new Path("/springBoot.pdf");
+>      OutputStream os  = new FileOutputStream(file);
+>      InputStream is = fileSystem.open(dst);
+>      IOUtils.copyBytes(is,os,1024,true);
+>  }
+>  @Test
+>  public void testDownload02() throws IOException {
+>      Path dst=new Path("C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理3.pdf");
+>      Path src=new Path("/springBoot1.pdf");
+>      //fileSystem.copyToLocalFile(src,dst);
+>      fileSystem.copyToLocalFile(false,src,dst,true);
+>  }
+>  @Test
+>  public void testDelete() throws IOException {
+>      Path src=new Path("/user");
 > 
->         fileSystem.delete(src,true);//true 表示递归删除子文件夹
->     }
+>      fileSystem.delete(src,true);//true 表示递归删除子文件夹
+>  }
 > 
->     @Test
->     public void testExists() throws IOException {
->         Path src=new Path("/springBoot1.pdf");
->         boolean exists = fileSystem.exists(src);
->         assertTrue(exists);
->     }
->     @Test
->     public void testMkdir() throws IOException {
->         Path src=new Path("/demo/access");
->         boolean exists = fileSystem.exists(src);
->         if(!exists){
->             fileSystem.mkdirs(src);
->         }
->     }
->     @Test
->     public void testListFiles() throws IOException {
->         Path src=new Path("/");
->         RemoteIterator<LocatedFileStatus> files = fileSystem.listFiles(src, true);
+>  @Test
+>  public void testExists() throws IOException {
+>      Path src=new Path("/springBoot1.pdf");
+>      boolean exists = fileSystem.exists(src);
+>      assertTrue(exists);
+>  }
+>  @Test
+>  public void testMkdir() throws IOException {
+>      Path src=new Path("/demo/access");
+>      boolean exists = fileSystem.exists(src);
+>      if(!exists){
+>          fileSystem.mkdirs(src);
+>      }
+>  }
+>  @Test
+>  public void testListFiles() throws IOException {
+>      Path src=new Path("/");
+>      RemoteIterator<LocatedFileStatus> files = fileSystem.listFiles(src, true);
 > 
->         while (files.hasNext()){
->             LocatedFileStatus file = files.next();
->             System.out.println(file.getPath()+" "+file.isFile()+" "+file.getLen());
->             BlockLocation[] locations = file.getBlockLocations();
->             for (BlockLocation location : locations) {
->                 System.out.println("offset:"+location.getOffset()+",length:"+location.getLength());
->             }
->         }
+>      while (files.hasNext()){
+>          LocatedFileStatus file = files.next();
+>          System.out.println(file.getPath()+" "+file.isFile()+" "+file.getLen());
+>          BlockLocation[] locations = file.getBlockLocations();
+>          for (BlockLocation location : locations) {
+>              System.out.println("offset:"+location.getOffset()+",length:"+location.getLength());
+>          }
+>      }
 > 
->     }
->     @Test
->     public void testDeleteWithTrash() throws IOException {
->         Trash trash=new Trash(fileSystem,conf);
->         Path dst=new Path("/springBoot1.pdf");
->         trash.moveToTrash(dst);
->     }
->     @After
->     public void after() throws IOException {
->         fileSystem.close();
->     }
+>  }
+>  @Test
+>  public void testDeleteWithTrash() throws IOException {
+>      Trash trash=new Trash(fileSystem,conf);
+>      Path dst=new Path("/springBoot1.pdf");
+>      trash.moveToTrash(dst);
+>  }
+>  @After
+>  public void after() throws IOException {
+>      fileSystem.close();
+>  }
 > 
 > }
+> 
 > 
 > ```
 >
@@ -547,14 +553,15 @@ comment: true
 >
 > ```xml
 > <property>
->     <name>yarn.nodemanager.aux-services</name>
->     <value>mapreduce_shuffle</value>
+>  <name>yarn.nodemanager.aux-services</name>
+>  <value>mapreduce_shuffle</value>
 > </property>
 > <!--Resource Manager-->
 > <property>
->     <name>yarn.resourcemanager.hostname</name>
->     <value>CentOS</value>
+>  <name>yarn.resourcemanager.hostname</name>
+>  <value>CentOS</value>
 > </property>
+> 
 > 
 > ```
 >
@@ -562,9 +569,10 @@ comment: true
 >
 > ```xml
 > <property>
->     <name>mapreduce.framework.name</name>
->     <value>yarn</value>
+>  <name>mapreduce.framework.name</name>
+>  <value>yarn</value>
 > </property>
+> 
 > 
 > ```
 >
@@ -578,6 +586,7 @@ comment: true
 > 11722 SecondaryNameNode
 > 18492 ResourceManager
 > 18573 NodeManager
+> 
 > 
 > 
 > ```
