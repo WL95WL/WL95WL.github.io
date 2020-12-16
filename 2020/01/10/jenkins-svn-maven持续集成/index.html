@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>jenkins+svn+maven持续集成 | Black eight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="WL">
+  <meta name="keywords" content>
+  <meta name="description" content="Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride">
+  <script id="hexo-configurations">
+  var CONFIG = {
+    root: '/',
+    theme: 'hexo-theme-lx',
+    version: '1.4.5',
+    localsearch:{
+      "enable": true,
+      "trigger": "auto",
+      "top_n_per_article": 1,
+      "unescape": false,
+      "preload": false
+      },
+    path: 'search.xml'
+  };
+</script>
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery.jside.menu.js"></script>
+	<script>
+	$(document).ready(function(){
+	$(".menu-container").jSideMenu({
+	    jSidePosition: "position-right",
+	    jSideSticky: true,
+	    jSideSkin: "endless-river",
+	     });
+	}); 
+	</script>
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300|Noto+Serif+SC&amp;display=swap">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+</head>
+<body>
+<div class="single">
+<div id="page">
+<div id="lx-aside" style="background-image: url(/images/page-cover.jpg)" data-stellar-background-ratio="0.5">
+  <div class="overlay">
+  <div class="page-title">
+    <div class="avatar"><a href="/"><img src="/images/person_1.jpg"></a></div>
+    <span>2020-01-10</span>
+    <h2>jenkins+svn+maven持续集成</h2>
+    <div class="tags"><i class="fa fa-tag"></i><a class="tag-link" href="/tags/Jenkins/">Jenkins</a></div>
+    </div>
+</div>
+</div>
+<div id="lx-main-content">
+  <div class="lx-post">
+    <div class="lx-entry padding">
+      <div>
+        <h1 id="jenkins-svn-maven持续集成"><a href="#jenkins-svn-maven持续集成" class="headerlink" title="jenkins+svn+maven持续集成"></a>jenkins+svn+maven持续集成</h1><h1 id="一-安装svn"><a href="#一-安装svn" class="headerlink" title="一.安装svn"></a>一.安装svn</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install subversion</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><h2 id="2-1-创建仓库"><a href="#2-1-创建仓库" class="headerlink" title="2.1. 创建仓库"></a>2.1. 创建仓库</h2><p>我们这里在<code>/home</code>下建立一个名为<code>svn</code>的仓库（repository），以后所有代码都放在这个下面，创建成功后在svn下面多了几个文件夹。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost /]# cd /home</span><br><span class="line">[root@localhost home]# mkdir svn</span><br><span class="line">[root@localhost home]# svnadmin create /home/svn</span><br><span class="line">[root@localhost home]# ls svn</span><br><span class="line">conf  db  format  hooks  locks  README.txt</span><br></pre></td></tr></table></figure>
+
+<p>我们这里特别关注一下<code>conf</code>文件夹，这个是存放配置文件的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost home]# cd svn/conf</span><br><span class="line">[root@localhost conf]# ls</span><br><span class="line">authz  passwd  svnserve.conf</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li>authz 是权限控制文件</li>
+<li>passwd 是帐号密码文件</li>
+<li>svnserve.conf 是SVN服务配置文件</li>
+</ul>
+<p>接下来我们依次修改这3个文件。</p>
+<h2 id="2-2-配置passwd"><a href="#2-2-配置passwd" class="headerlink" title="2.2. 配置passwd"></a>2.2. 配置passwd</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost conf]# vi passwd </span><br><span class="line">[users]</span><br><span class="line">test1=123456</span><br><span class="line">test2=123456</span><br></pre></td></tr></table></figure>
+
+<p>上面的例子中我们创建了2个用户，一个test1，一个test2</p>
+<p><img src="/2020/01/10/jenkins-svn-maven持续集成/1.jpg" alt></p>
+<h2 id="2-3-配置authz"><a href="#2-3-配置authz" class="headerlink" title="2.3. 配置authz"></a>2.3. 配置authz</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost conf]# vi authz </span><br><span class="line">[/]</span><br><span class="line">liuxianan=rw</span><br><span class="line">test1=r</span><br><span class="line">test2=r</span><br><span class="line">*=</span><br></pre></td></tr></table></figure>
+
+<p>上面配置的含义是，<code>liuxianan</code>对<code>/home/svn/</code>下所有文件具有可读可写权限，<code>test</code>只有只读权限，除此之外，其它用户均无任何权限，最后一行<code>*=</code>很重要不能少。</p>
+<p><img src="/2020/01/10/jenkins-svn-maven持续集成/2.png" alt="img"></p>
+<h3 id="2-3-1-拓展：使用用户分组"><a href="#2-3-1-拓展：使用用户分组" class="headerlink" title="2.3.1. 拓展：使用用户分组"></a>2.3.1. 拓展：使用用户分组</h3><p>这个我一般不用，但是记录下来。</p>
+<p>还是这个文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost conf]# vi authz</span><br><span class="line">[groups]</span><br><span class="line">group1 = liuxianan</span><br><span class="line">group2 = test1,test2</span><br><span class="line">[/]</span><br><span class="line">@group1 = rw</span><br><span class="line">@group2 = r</span><br><span class="line">* =</span><br></pre></td></tr></table></figure>
+
+<p>上面配置中创建了2个分组，分组1的用户可读可写，分组2的用户只读。</p>
+<p>格式说明：</p>
+<blockquote>
+<p>版本库目录格式：<br>[&lt;版本库&gt;:/项目/目录]<br>@&lt;用户组名&gt; = &lt;权限&gt;<br>&lt;用户名&gt; = &lt;权限&gt;</p>
+</blockquote>
+<h2 id="2-4-配置svnserve-conf"><a href="#2-4-配置svnserve-conf" class="headerlink" title="2.4. 配置svnserve.conf"></a>2.4. 配置svnserve.conf</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost conf]# vi svnserve.conf </span><br><span class="line">打开下面的5个注释</span><br><span class="line">anon-access = read #匿名用户可读</span><br><span class="line">auth-access = write #授权用户可写</span><br><span class="line">password-db = passwd #使用哪个文件作为账号文件</span><br><span class="line">authz-db = authz #使用哪个文件作为权限文件</span><br><span class="line">realm = /home/svn # 认证空间名，版本库所在目录</span><br></pre></td></tr></table></figure>
+
+<p>2点注意：</p>
+<ul>
+<li>最后一行的realm记得改成你的svn目录</li>
+<li>打开注释时切记前面<strong>不要留有空格</strong>，否则可能有问题（网上说的，我没有亲测）</li>
+</ul>
+<p><img src="/2020/01/10/jenkins-svn-maven持续集成/3.png" alt="img"></p>
+<h1 id="启动与停止"><a href="#启动与停止" class="headerlink" title="启动与停止"></a>启动与停止</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost conf]# svnserve -d -r /home/svn（启动）</span><br><span class="line">[root@localhost conf]#killall svnserve（停止）</span><br></pre></td></tr></table></figure>
+
+<p>上述启动命令中，<code>-d</code>表示守护进程， <code>-r</code> 表示在后台执行。停止还可以采用杀死进程的方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost conf]# ps -ef|grep svnserve</span><br><span class="line">root      4908     1  0 21:32 ?        00:00:00 svnserve -d -r /home/svn</span><br><span class="line">root      4949  4822  0 22:05 pts/0    00:00:00 grep svnserve</span><br><span class="line">[root@localhost conf]# kill -9 4908</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/01/10/jenkins-svn-maven持续集成/4.png" alt="img"></p>
+<p>最后来个总的截图：</p>
+<p><img src="/2020/01/10/jenkins-svn-maven持续集成/5.png" alt="img"></p>
+<h1 id="客户端连接"><a href="#客户端连接" class="headerlink" title="客户端连接"></a>客户端连接</h1><p>这里使用TortoiseSVN，输入地址<code>svn://你的IP</code> 即可，不出意外输入用户名和密码就能连接成功了。</p>
+<p>默认端口3690，如果你修改了端口，那么要记得加上端口号。</p>
+<p><img src="/2020/01/10/jenkins-svn-maven持续集成/6.png" alt="img"></p>
+<h1 id="二、安装maven"><a href="#二、安装maven" class="headerlink" title="二、安装maven"></a>二、安装maven</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1.进入maven官网下载文件，解压maven的tar文件</span><br><span class="line">tar -zxvf apache-maven-XXX-bin.tar.gz </span><br><span class="line">2.编辑配置文件</span><br><span class="line">vim /etc/profile</span><br><span class="line">3.添加如下配置</span><br><span class="line">export MAVEN_HOME=/opt/maven/apache-maven-3.6.3</span><br><span class="line">export PATH=$MAVEN_HOME/bin:$PATH</span><br><span class="line">4.刷新配置文件</span><br><span class="line">source /etc/profile</span><br><span class="line">5.检测</span><br><span class="line">mvn -v</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、安装Jenkins"><a href="#三、安装Jenkins" class="headerlink" title="三、安装Jenkins"></a>三、安装Jenkins</h1><p>1.通过Tomcat将Jenkins.war放入webapps中  访问： <a href="http://ip:port/jenkins" target="_blank" rel="noopener">http://ip:port/jenkins</a>  </p>
+<p>Jenkins安装完成后配置参考：<a href="https://blog.csdn.net/baidu_38432732/article/details/80499898" target="_blank" rel="noopener">https://blog.csdn.net/baidu_38432732/article/details/80499898</a></p>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lx-navigation">
+	<div class="lx-cover prev lx-cover-sm" style="background-image: url(/images/footer_1.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2020/01/13/NoSql相关知识/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Next</span>
+						<h3>NoSql相关知识</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+        <div class="lx-cover next lx-cover-sm" style="background-image: url(/images/footer_2.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2019/12/09/docker安装与使用/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Prev</span>
+						<h3>docker</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+</div>
+<div class="comment"><div id="comments"></div></div>
+<footer>
+  <div>
+  Copyright &copy; 2019.<a href="/">Black eight</a><br><img src="http://dchip-web.z-chip.com/download/2020-07-24/16.37.38/%E5%A4%87%E6%A1%88%E5%9B%BE%E6%A0%87.png">京公网安备 11010802032453号<br>
+  </div>
+</footer>
+</div>
+<a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i></a>
+<div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Search..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+<button class="menu-trigger"></button>
+<div class="menu">
+  <div class="menu-head">
+    <span class="layer">
+      <div class="col">
+        <div class="row for-pic">
+          <div class="profile-pic">
+            <a href="/"><img src="/images/person_1.jpg" alt="WL"></a>
+          </div>
+        </div>
+        <div class="row for-name">
+          <p>WL</p>
+          <span class="tagline">Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride</span>
+        </div>
+      </div>
+    </span>
+  </div>
+  <nav class="menu-container">
+  <ul class="menu-items">
+    <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+    <li><a href="/archives/"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-bookmark fa-fw"></i>页面</span>
+        <ul>
+          <li><a href="/guestbook">留言</a></li>
+        <li><a href="/about">关于</a></li>
+        </ul>
+    </li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-link fa-fw"></i>友链</span>
+        <ul>
+          <li> <a href="https://lx.blleng.cn" target="_blank">Theme-Lx</a></li>
+        </ul>
+    </li>
+  </ul>
+  </nav>
+</div>
+
+<div class="gototop js-top">
+  <a href="#" class="js-gotop"><i class="fa fa-arrow-up"></i></a>
+</div>
+<script src="/js/jquery.easing.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.stellar.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/local.search.js"></script>
+<script src="//unpkg.com/valine"></script>
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YFLRL95mJxOLxyHI5EKXlr4Q-gzGzoHsz',
+    appKey: 'FO7iHJSy5vVqCIW3goFYWD5x',
+    placeholder: '此处留言',
+    avatar: 'identicon',
+    meta: guest,
+    pageSize: '10' || 10,
+    lang: 'zh-cn' || 'zh-cn'
+  });
+</script>
+
+</body>
+</html>

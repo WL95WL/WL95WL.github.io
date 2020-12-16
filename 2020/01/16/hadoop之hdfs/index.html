@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>hadoop之hdfs | Black eight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="WL">
+  <meta name="keywords" content>
+  <meta name="description" content="Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride">
+  <script id="hexo-configurations">
+  var CONFIG = {
+    root: '/',
+    theme: 'hexo-theme-lx',
+    version: '1.4.5',
+    localsearch:{
+      "enable": true,
+      "trigger": "auto",
+      "top_n_per_article": 1,
+      "unescape": false,
+      "preload": false
+      },
+    path: 'search.xml'
+  };
+</script>
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery.jside.menu.js"></script>
+	<script>
+	$(document).ready(function(){
+	$(".menu-container").jSideMenu({
+	    jSidePosition: "position-right",
+	    jSideSticky: true,
+	    jSideSkin: "endless-river",
+	     });
+	}); 
+	</script>
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300|Noto+Serif+SC&amp;display=swap">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+</head>
+<body>
+<div class="single">
+<div id="page">
+<div id="lx-aside" style="background-image: url(/images/page-cover.jpg)" data-stellar-background-ratio="0.5">
+  <div class="overlay">
+  <div class="page-title">
+    <div class="avatar"><a href="/"><img src="/images/person_1.jpg"></a></div>
+    <span>2020-01-16</span>
+    <h2>hadoop之hdfs</h2>
+    <div class="tags"><i class="fa fa-tag"></i><a class="tag-link" href="/tags/hadoop/">hadoop</a></div>
+    </div>
+</div>
+</div>
+<div id="lx-main-content">
+  <div class="lx-post">
+    <div class="lx-entry padding">
+      <div>
+        <blockquote>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Hadoop分布式文件系统（HDFS）是一种旨在在商品硬件上运行的分布式文件系统。它与现有的分布式文件系统有许多相似之处。但是，与其他分布式文件系统的区别很明显。HDFS具有高度的容错能力，旨在部署在低成本硬件上。HDFS提供对应用程序数据的高吞吐量访问，并且适用于具有大数据集的应用程序。HDFS放宽了一些POSIX要求，以实现对文件系统数据的流式访问。HDFS最初是作为Apache Nutch Web搜索引擎项目的基础结构而构建的。HDFS是Apache Hadoop Core项目的一部分。项目URL是<a href="http://hadoop.apache.org/" target="_blank" rel="noopener">http://hadoop.apache.org/</a>。</p>
+<h2 id="HDFS-Architecture"><a href="#HDFS-Architecture" class="headerlink" title="HDFS Architecture"></a>HDFS Architecture</h2><blockquote>
+<p>源自:<a href="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html" target="_blank" rel="noopener">http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html</a></p>
+</blockquote>
+<p>HDFS has a master/slave architecture. An HDFS cluster consists of a single NameNode, ==a master server that manages the file system namespace and regulates access to files by clients==. In addition, there are a number of DataNodes, usually one per node in the cluster, which manage storage attached to the nodes that they run on. HDFS exposes a file system namespace and allows user data to be stored in files. Internally, a file is split into one or more blocks and these blocks are stored in a set of DataNodes. The NameNode executes file system namespace operations like opening, closing, and renaming files and directories. ==It also determines the mapping of blocks to DataNodes.== The DataNodes are responsible for serving read and write requests from the file system’s clients. The DataNodes also perform block creation, deletion, and replication upon instruction from the NameNode. </p>
+<p>HDFS具有主/从体系结构。HDFS群集由单个NameNode和管理文件系统名称空间并控制客户端对文件的访问的主服务器组成。此外，还有许多数据节点，通常是集群中每个节点一个，用于管理与它们所运行的节点相连的存储。HDFS公开了文件系统名称空间，并允许用户数据存储在文件中。在内部，文件被分成一个或多个块，这些块存储在一组DataNode中。NameNode执行文件系统名称空间操作，例如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射。DataNode负责处理来自文件系统客户端的读写请求。DataNode还会执行块创建，删除</p>
+<p><img src="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/images/hdfsarchitecture.png" alt="架构图"></p>
+<p><code>namenode</code>:存储系统的元数据(用于描述数据的数据,==内存==),例如 文件命名空间/block到datanode的映射.负责管理datanode</p>
+<p><code>datanode</code>:用于存储数据块的节点.负责响应客户端对块的读写请求,向namenode汇报自己块信息.</p>
+<p><code>block</code>:数据块,是对文件拆分的最小单位,表示一个切分尺度默认值128MB,每个数据块的默认副本因子是<code>3</code>通过<code>dfs.replication</code>进行配置,用户可以通过<code>dfs.blocksize</code>设置块大小</p>
+<p><code>rack</code>机架,使用机架对存储节点做物理编排,用于优化存储和计算</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; [root@CentOS ~]# hdfs dfsadmin -printTopology  查看机架</span><br><span class="line">&gt; Rack: /default-rack</span><br><span class="line">&gt; 192.168.169.139:50010 (CentOS)</span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><em>为什么说HDFS不擅长存储小文件?</em></p>
+<table>
+<thead>
+<tr>
+<th align="center">文件</th>
+<th align="center">namenode占用(内存)</th>
+<th align="center">datanode占用磁盘</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">128MB 单个文件</td>
+<td align="center">1个block元数据信息</td>
+<td align="center">128MB  *  副本因子</td>
+</tr>
+<tr>
+<td align="center">128MB 10000个文件</td>
+<td align="center">10000个block元数据信息</td>
+<td align="center">128MB  *  副本因子</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>因为Namenode是使用单机的内存存储元数据,因此导致namenode内存紧张.</p>
+</blockquote>
+<p><em>NameNode和Secondary Namenode的关系?</em></p>
+<p><img src="/2020/01/16/hadoop之hdfs/secondary.png" alt></p>
+<blockquote>
+<p>fsimage 文件镜像</p>
+<p>edits 日志文件</p>
+<p>辅助NameNode整理Edits和Fsimage文件,加速NameNode启动过程.</p>
+<p><a href="https://blog.csdn.net/WYpersist/article/details/79840776" target="_blank" rel="noopener">https://blog.csdn.net/WYpersist/article/details/79840776</a></p>
+</blockquote>
+<h3 id="安全模式"><a href="#安全模式" class="headerlink" title="安全模式"></a>安全模式</h3><p>启动时，NameNode进入一个特殊的状态，称为安全模式。当NameNode处于安全模式状态时，不会发生数据块的复制。NameNode从数据节点接收心跳和Blockreport消息。Blockreport包含DataNode托管的数据块列表。每个块都有指定的最小副本数。当已使用NameNode检入该数据块的最小副本数时，该块被视为已安全复制。在使用可配置百分比的安全复制数据块通过NameNode签入（再加上30秒）后，NameNode退出安全模式状态。然后，它确定仍少于指定数量的副本的数据块列表（如果有）。然后，NameNode将这些块复制到其他DataNode。</p>
+<h2 id="文件系统元数据的持久性"><a href="#文件系统元数据的持久性" class="headerlink" title="文件系统元数据的持久性"></a>文件系统元数据的持久性</h2><p>HDFS命名空间由NameNode存储。NameNode使用一个称为EditLog的事务日志来永久记录文件系统元数据发生的每个更改。例如，在HDFS中创建一个新文件将导致NameNode将一条记录插入到EditLog中，以表明这一点。同样，更改文件的复制因子会导致将新记录插入到EditLog中。NameNode使用其本地主机OS文件系统中的文件来存储EditLog。整个文件系统名称空间（包括块到文件的映射和文件系统属性）存储在名为FsImage的文件中。FsImage也作为文件存储在NameNode的本地文件系统中。</p>
+<p>NameNode在内存中保留整个文件系统名称空间和文件Blockmap的图像。当NameNode启动或由可配置的阈值触发检查点时，它会从磁盘读取FsImage和EditLog，将EditLog中的所有事务应用于FsImage的内存中表示形式，并将此新版本刷新为磁盘上的新FsImage。然后，它可以截断旧的EditLog，因为其事务已应用于持久性FsImage。此过程称为检查点。检查点的目的是通过获取文件系统元数据的快照并将其保存到FsImage来确保HDFS具有文件系统元数据的一致视图。即使读取FsImage效率很高，但直接对FsImage进行增量编辑效率也不高。我们无需为每个编辑修改FsImage，而是将编辑保留在Editlog中。在检查点期间，来自Editlog的更改将应用于FsImage。可以在给定的时间间隔触发检查点（``以秒表示的<code>dfs.namenode.checkpoint.period</code>，或者在累积一定数量的文件系统事务之后（<code>dfs.namenode.checkpoint.txns</code>）。如果同时设置了这两个属性，则要达到的第一个阈值将触发检查点。</p>
+<p>DataNode将HDFS数据存储在其本地文件系统中的文件中。DataNode不了解HDFS文件。它将每个HDFS数据块存储在其本地文件系统中的单独文件中。DataNode不会在同一目录中创建所有文件。而是使用启发式方法确定每个目录的最佳文件数，并适当创建子目录。在同一目录中创建所有本地文件不是最佳选择，因为本地文件系统可能无法有效地支持单个目录中的大量文件。当DataNode启动时，它将扫描其本地文件系统，生成与每个本地文件相对应的所有HDFS数据块的列表，并将此报告发送到NameNode。该报告称为<em>Blockreport</em>。</p>
+<h2 id="通讯协议"><a href="#通讯协议" class="headerlink" title="通讯协议"></a>通讯协议</h2><p>所有HDFS通信协议都位于TCP / IP协议之上。客户端建立与NameNode计算机上可配置TCP端口的连接。它将ClientProtocol与NameNode进行通信。DataNode使用DataNode协议与NameNode对话。远程过程调用（RPC）抽象包装了客户端协议和DataNode协议。按照设计，NameNode永远不会启动任何RPC。相反，它仅响应由DataNode或客户端发出的RPC请求。</p>
+<h2 id="坚固性"><a href="#坚固性" class="headerlink" title="坚固性"></a>坚固性</h2><p>HDFS的主要目标是即使出现故障也能可靠地存储数据。三种常见的故障类型是NameNode故障，DataNode故障和网络分区。</p>
+<h3 id="数据磁盘故障，心跳和复制"><a href="#数据磁盘故障，心跳和复制" class="headerlink" title="数据磁盘故障，心跳和复制"></a>数据磁盘故障，心跳和复制</h3><p>每个DataNode定期向NameNode发送心跳消息。网络分区可能导致一部分DataNode失去与NameNode的连接。NameNode通过缺少心跳消息来检测到这种情况。NameNode将没有最近心跳的DataNode标记为已死，并且不会将任何新的IO请求转发给它们。已注册到失效DataNode的任何数据不再可用于HDFS。DataNode死亡可能导致某些块的复制因子降至其指定值以下。NameNode不断跟踪需要复制的块，并在必要时启动复制。由于许多原因，可能需要进行重新复制：DataNode可能不可用，副本可能损坏，DataNode上的硬盘可能发生故障，</p>
+<p>标记DataNode失效的超时时间保守地长（默认情况下超过10分钟），以避免由DataNode的状态震荡引起的复制风暴。用户可以设置较短的时间间隔以将DataNode标记为过时，并通过配置来避免对性能敏感的工作负载进行读和/或写时出现过时的节点。</p>
+<h3 id="集群再平衡"><a href="#集群再平衡" class="headerlink" title="集群再平衡"></a>集群再平衡</h3><p>HDFS体系结构与数据重新平衡方案兼容。如果DataNode的可用空间低于某个阈值，则方案可能会自动将数据从一个DataNode移至另一个DataNode。如果对特定文件的需求突然增加，则方案可能会动态创建其他副本并重新平衡群集中的其他数据。这些类型的数据重新平衡方案尚未实现。</p>
+<h3 id="数据的完整性"><a href="#数据的完整性" class="headerlink" title="数据的完整性"></a>数据的完整性</h3><p>从DataNode提取的数据块可能会损坏。由于存储设备故障，网络故障或软件故障，可能会导致这种损坏。HDFS客户端软件对HDFS文件的内容执行校验和检查。客户端创建HDFS文件时，它将计算文件每个块的校验和，并将这些校验和存储在同一HDFS命名空间中的单独的隐藏文件中。客户端检索文件内容时，它将验证从每个DataNode接收的数据是否与存储在关联的校验和文件中的校验和匹配。如果不是，则客户端可以选择从另一个具有该块副本的DataNode中检索该块。</p>
+<h3 id="元数据磁盘故障"><a href="#元数据磁盘故障" class="headerlink" title="元数据磁盘故障"></a>元数据磁盘故障</h3><p>FsImage和EditLog是HDFS的中央数据结构。这些文件损坏可能导致HDFS实例无法正常运行。因此，可以将NameNode配置为支持维护FsImage和EditLog的多个副本。FsImage或EditLog的任何更新都会导致FsImages和EditLogs中的每个同步更新。FsImage和EditLog的多个副本的这种同步更新可能会降低NameNode可以支持的每秒名称空间事务处理的速度。但是，这种降级是可以接受的，因为即使HDFS应用程序本质上是数据密集型的，但它们也不是元数据密集型的。当NameNode重新启动时，它将选择要使用的最新一致的FsImage和EditLog。</p>
+<p>增强抗故障能力的另一种方法是使用多个NameNode来启用高可用性，这些NameNode可以<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithNFS.html" target="_blank" rel="noopener">在NFS上</a>使用<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithNFS.html" target="_blank" rel="noopener">共享存储，</a>也可以使用<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html" target="_blank" rel="noopener">分布式编辑日志</a>（称为Journal）。推荐使用后者。</p>
+<h3 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h3><p><a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsSnapshots.html" target="_blank" rel="noopener">快照</a>支持在特定时间存储数据副本。快照功能的一种用法可能是将损坏的HDFS实例回滚到以前已知的良好时间点。</p>
+<h2 id="资料组织"><a href="#资料组织" class="headerlink" title="资料组织"></a>资料组织</h2><h3 id="数据块"><a href="#数据块" class="headerlink" title="数据块"></a>数据块</h3><p>HDFS旨在支持非常大的文件。与HDFS兼容的应用程序是处理大型数据集的应用程序。这些应用程序仅写入一次数据，但读取一次或多次，并要求以流速度满足这些读取要求。HDFS支持文件上一次写入多次读取的语义。HDFS使用的典型块大小为128 MB。因此，HDFS文件被切成128 MB的块，并且如果可能的话，每个块将驻留在不同的DataNode上。</p>
+<h3 id="复制管道"><a href="#复制管道" class="headerlink" title="复制管道"></a>复制管道</h3><p>当客户端将数据写入复制因子为3的HDFS文件时，NameNode使用复制目标选择算法检索DataNode列表。该列表包含将托管该块副本的DataNode。然后，客户端写入第一个DataNode。第一个DataNode开始分批接收数据，将每个部分写入其本地存储库，然后将该部分传输到列表中的第二个DataNode。第二个DataNode依次开始接收数据块的每个部分，将该部分写入其存储库，然后将该部分刷新到第三个DataNode。最后，第三个DataNode将数据写入其本地存储库。因此，DataNode可以从流水线中的前一个接收数据，同时将数据转发到流水线中的下一个。从而，</p>
+<h2 id="辅助功能"><a href="#辅助功能" class="headerlink" title="辅助功能"></a>辅助功能</h2><p>可以通过许多不同的方式从应用程序访问HDFS。HDFS本身就为应用程序提供了<a href="http://hadoop.apache.org/docs/current/api/" target="_blank" rel="noopener">FileSystem Java API</a>。一<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/LibHdfs.html" target="_blank" rel="noopener">本Java API的C语言包装</a>和<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/WebHDFS.html" target="_blank" rel="noopener">REST API</a>也是可用的。此外，HTTP浏览器还可以用于浏览HDFS实例的文件。通过使用<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsNfsGateway.html" target="_blank" rel="noopener">NFS网关</a>，HDFS可以作为客户端本地文件系统的一部分安装。</p>
+<h3 id="FS外壳"><a href="#FS外壳" class="headerlink" title="FS外壳"></a>FS外壳</h3><p>HDFS允许以文件和目录的形式组织用户数据。它提供了一个称为<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html" target="_blank" rel="noopener">FS shell</a>的命令行界面，该界面可让用户与HDFS中的数据进行交互。该命令集的语法类似于用户已经熟悉的其他shell（例如bash，csh）。以下是一些示例操作/命令对：</p>
+<table>
+<thead>
+<tr>
+<th>行动</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建一个名为<code>/ foodir</code>的目录``</td>
+<td><code>bin / hadoop dfs -mkdir / foodir</code></td>
+</tr>
+<tr>
+<td>删除名为<code>/ foodir</code>的目录``</td>
+<td><code>bin / hadoop fs -rm -R / foodir</code></td>
+</tr>
+<tr>
+<td>查看名为<code>/foodir/myfile.txt</code>的文件的内容``</td>
+<td><code>bin / hadoop dfs -cat /foodir/myfile.txt</code></td>
+</tr>
+</tbody></table>
+<p>FS Shell适用于需要脚本语言与存储的数据进行交互的应用程序。</p>
+<h3 id="DFS管理员"><a href="#DFS管理员" class="headerlink" title="DFS管理员"></a>DFS管理员</h3><p>DFSAdmin命令集用于管理HDFS群集。这些是仅由HDFS管理员使用的命令。以下是一些示例操作/命令对：</p>
+<table>
+<thead>
+<tr>
+<th>行动</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>将群集置于安全模式</td>
+<td><code>bin / hdfs dfsadmin -safemode输入</code></td>
+</tr>
+<tr>
+<td>生成数据节点列表</td>
+<td><code>bin / hdfs dfsadmin -report</code></td>
+</tr>
+<tr>
+<td>重新启用或停用DataNode</td>
+<td><code>bin / hdfs dfsadmin -refreshNodes</code></td>
+</tr>
+</tbody></table>
+<h3 id="浏览器界面"><a href="#浏览器界面" class="headerlink" title="浏览器界面"></a>浏览器界面</h3><p>典型的HDFS安装会将Web服务器配置为通过可配置的TCP端口公开HDFS命名空间。这允许用户使用Web浏览器浏览HDFS命名空间并查看其文件的内容。</p>
+<h2 id="填海工程"><a href="#填海工程" class="headerlink" title="填海工程"></a>填海工程</h2><h3 id="文件删除和取消删除"><a href="#文件删除和取消删除" class="headerlink" title="文件删除和取消删除"></a>文件删除和取消删除</h3><p>如果启用垃圾箱配置，则不会立即从HDFS中删除由<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html#rm" target="_blank" rel="noopener">FS Shell</a>删除的文件。而是，HDFS将其移动到回收站目录（每个用户在/ user / &lt;用户名&gt; <code>/。Trash</code>下都有自己的回收站目录）。只要文件保留在垃圾桶中，就可以快速恢复。</p>
+<p>最新删除的文件被移动到当前的回收站目录（<code>/ user / &lt;用户名&gt; ``/。Trash / Current</code>），并在可配置的间隔内，HDFS创建检查点（在<code>/ user / &lt;用户名&gt; ``/。Trash ``/ &lt;date&gt;下</code>）用于当前回收站目录中的文件，并在过期时删除旧的检查点。有关垃圾的检查点，请参见<a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html#expunge" target="_blank" rel="noopener">FS shell的expunge命令</a>。</p>
+<p>在垃圾桶中到期后，NameNode将从HDFS命名空间中删除该文件。文件的删除导致与文件关联的块被释放。请注意，在用户删除文件的时间与HDFS中相应的可用空间增加的时间之间可能会有明显的时间延迟。</p>
+<p>下面是一个示例，它将显示FS Shell如何从HDFS删除文件。我们在目录delete下创建了2个文件（test1和test2）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; $ hadoop fs -mkdir -p删除/测试1</span><br><span class="line">&gt; $ hadoop fs -mkdir -p删除/测试2</span><br><span class="line">&gt; $ hadoop fs -ls删除/</span><br><span class="line">&gt; 找到2项</span><br><span class="line">&gt; drwxr-xr-x-hadoop hadoop 0 2015-05-08 12:39删除/测试1</span><br><span class="line">&gt; drwxr-xr-x-hadoop hadoop 0 2015-05-08 12:40删除/ test2</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>我们将删除文件test1。下面的注释显示文件已移至“废纸directory”目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; $ hadoop fs -rm -r删除/测试1</span><br><span class="line">&gt; 移动到：hdfs：// localhost：8020 / user / hadoop / .hdfs：// localhost：8020 / user / hadoop / delete / test1移至垃圾桶。垃圾桶/当前</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>现在我们要使用skipTrash选项删除文件，该选项不会将文件发送到Trash。它将从HDFS中完全删除。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; $ hadoop fs -rm -r -skip垃圾删除/测试2</span><br><span class="line">&gt; 删除删除/测试2</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>现在我们可以看到“废纸contains”目录仅包含文件test1。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; $ hadoop fs -ls。垃圾桶/当前/用户/ hadoop /删除/</span><br><span class="line">&gt; 找到1项\</span><br><span class="line">&gt; drwxr-xr-x-hadoop hadoop 0 2015-05-08 12:39 .Trash / Current / user / hadoop / delete / test1</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>因此，文件test1进入垃圾箱，文件test2被永久删除。</p>
+<h3 id="减少复制因子"><a href="#减少复制因子" class="headerlink" title="减少复制因子"></a>减少复制因子</h3><p>当减少文件的复制因子时，NameNode选择可以删除的多余副本。下一个心跳将此信息传输到DataNode。然后，DataNode删除相应的块，并且相应的可用空间出现在群集中。同样，在setReplication API调用完成与群集中的可用空间出现之间可能会有时间延迟。</p>
+<p><em>HDFS Shell</em></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -help</span><br><span class="line"><span class="meta">&gt;</span> Usage: hadoop fs [generic options]</span><br><span class="line"><span class="meta">&gt;</span> 	[-appendToFile &lt;localsrc&gt; ... &lt;dst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-cat [-ignoreCrc] &lt;src&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-checksum &lt;src&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-chmod [-R] &lt;MODE[,MODE]... | OCTALMODE&gt; PATH...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-copyFromLocal [-f] [-p] [-l] &lt;localsrc&gt; ... &lt;dst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-copyToLocal [-p] [-ignoreCrc] [-crc] &lt;src&gt; ... &lt;localdst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-cp [-f] [-p | -p[topax]] &lt;src&gt; ... &lt;dst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-get [-p] [-ignoreCrc] [-crc] &lt;src&gt; ... &lt;localdst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-help [cmd ...]]</span><br><span class="line"><span class="meta">&gt;</span> 	[-ls [-d] [-h] [-R] [&lt;path&gt; ...]]</span><br><span class="line"><span class="meta">&gt;</span> 	[-mkdir [-p] &lt;path&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-moveFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-moveToLocal &lt;src&gt; &lt;localdst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-mv &lt;src&gt; ... &lt;dst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-put [-f] [-p] [-l] &lt;localsrc&gt; ... &lt;dst&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-rm [-f] [-r|-R] [-skipTrash] &lt;src&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-rmdir [--ignore-fail-on-non-empty] &lt;dir&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-tail [-f] &lt;file&gt;]</span><br><span class="line"><span class="meta">&gt;</span> 	[-text [-ignoreCrc] &lt;src&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-touchz &lt;path&gt; ...]</span><br><span class="line"><span class="meta">&gt;</span> 	[-usage [cmd ...]]</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>appendToFile</strong>  追加文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -appendToFile /root/install.log /aa.log</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>cat</strong>  查看</p>
+<p>hdfs dfs   或Hadoop fs</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hadoop fs -cat /aa.log</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>checksum</strong>  查看文件签名 类似于liunx的MD5sum</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -checksum /aa.log</span><br><span class="line"><span class="meta">&gt;</span> /aa.log	MD5-of-0MD5-of-512CRC32C	000002000000000000000000fa622ce196be3efd11475d6b55af76d2</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>chmod</strong>  修改权限</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hadoop fs -chmod -R u+x /</span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hadoop fs -ls -R  /</span><br><span class="line"><span class="meta">&gt;</span> -rwxr--r--   1 root supergroup      17630 2019-01-03 09:05 /aa.log</span><br><span class="line"><span class="meta">&gt;</span> -rwxr--r--   1 root supergroup  175262413 2019-01-02 20:29 /jdk-8u171-linux-x64.rpm</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>copyFromLocal 从本地copy文件到hdfs/  从hdfs copy文件到本地   copyToLocal</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -copyFromLocal|-put install.log /  # 上传</span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -copyToLocal|-get /install.log ~/  # 下载</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>cp</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -mkdir -p /demo/dir</span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -cp /install.log /demo/dir</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>moveFromLocal|moveToLocal</strong>  剪贴</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -moveFromLocal ~/install.log  /</span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# ls</span><br><span class="line"><span class="meta">&gt;</span> anaconda-ks.cfg  hadoop-2.6.0_x64.tar.gz  install.log.syslog</span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -moveToLocal /install.log  ~/ # 目前还没有实现</span><br><span class="line"><span class="meta">&gt;</span> moveToLocal: Option '-moveToLocal' is not implemented yet.</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>rm</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -rm -r -f /install.log</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>mv</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -mv /install.log  /bb.log</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>cat|text|tail</strong></p>
+<p>tail -f 监视文件输出</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -text /cc.log</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>touchz</strong> 创建文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -touchz /cc.log</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>distcp</strong>   hdfs系统之间的copy</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hadoop distcp hdfs://CentOS:9000/aa.log hdfs://CentOS:9000/demo/dir^C</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>更多参考:<a href="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html#appendToFile" target="_blank" rel="noopener">http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html#appendToFile</a></p>
+</blockquote>
+<h3 id="开启-HDFS-的回收站"><a href="#开启-HDFS-的回收站" class="headerlink" title="开启 HDFS 的回收站"></a>开启 HDFS 的回收站</h3><p><code>etc/hadoop/core-site.xml</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">&gt;      <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.trash.interval<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">&gt;      <span class="tag">&lt;<span class="name">value</span>&gt;</span>1<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>设置1分钟延迟,1分钟以后被删除文件会被系统彻底删除.防止用户误操作</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -rm -r -f /bb.log</span><br><span class="line"><span class="meta">&gt;</span> 19/01/03 12:27:08 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 1 minutes, Emptier interval = 0 minutes.</span><br><span class="line"><span class="meta">&gt;</span> Moved: 'hdfs://CentOS:9000/bb.log' to trash at: hdfs://CentOS:9000/user/root/.Trash/Current</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# hdfs dfs -rm -r -f -skipTrash /aa.log</span><br><span class="line"><span class="meta">&gt;</span> Deleted /aa.log</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<h2 id="JAVA-API-操作-HDFS"><a href="#JAVA-API-操作-HDFS" class="headerlink" title="JAVA API 操作 HDFS"></a>JAVA API 操作 HDFS</h2><p><strong>Maven</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hadoop<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hadoop-hdfs<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt; <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hadoop<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hadoop-common<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt; <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.12<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>Windows开发Hadoop应用环境配置</strong></p>
+<ul>
+<li>解压hadoop安装包到<code>C:/</code></li>
+<li>将<code>winutils.exe</code>和<code>hadoop.dll</code>拷贝到hadoop的bin目录下</li>
+<li>在windows配置HADOOP_HOME环境变量</li>
+<li>重启开发工具<code>idea</code>,否则开发工具无法识别HADOOP_HOME</li>
+<li>在Windows主机配置CentOS的主机名和IP的映射关系</li>
+</ul>
+<p><code>C:\Windows\System32\drivers\etc\hosts</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; 192.168.169.139 CentOS</span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>HDFS权限不足导致写失败?</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> org.apache.hadoop.security.AccessControlException: Permission denied: user=HIAPAD, access=WRITE, inode="/":root:supergroup:drwxr-xr-x</span><br><span class="line"><span class="meta">&gt;</span> 	at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkFsPermission(FSPermissionChecker.java:271)</span><br><span class="line"><span class="meta">&gt;</span> 	at org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:257)</span><br><span class="line"><span class="meta">&gt;</span> ...</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>解决方案</strong></p>
+<p><em>方案1</em></p>
+<p><code>etc/hadoop/hdfs-site.xml</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">&gt;      <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.permissions.enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">&gt;      <span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>关闭HDFS文件权限检查,修改完成后,重启HDFS服务</p>
+</blockquote>
+<p><code>方案2</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> -DHADOOP_USER_NAME=root</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>设置JAVA虚拟机启动参数java XXX -Dxx=xxx</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</span><br><span class="line">&gt; <span class="keyword">import</span> org.apache.hadoop.fs.*;</span><br><span class="line">&gt; <span class="keyword">import</span> org.apache.hadoop.io.IOUtils;</span><br><span class="line">&gt; <span class="keyword">import</span> org.apache.hadoop.util.Progressable;</span><br><span class="line">&gt; <span class="keyword">import</span> org.junit.After;</span><br><span class="line">&gt; <span class="keyword">import</span> org.junit.Before;</span><br><span class="line">&gt; <span class="keyword">import</span> org.junit.Test;</span><br><span class="line">&gt; <span class="keyword">import</span> <span class="keyword">static</span> org.junit.Assert.*;</span><br><span class="line">&gt; <span class="keyword">import</span> java.io.*;</span><br><span class="line">&gt; </span><br><span class="line">&gt; <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestHDFSDemo</span> </span>&#123;</span><br><span class="line">&gt;  <span class="keyword">private</span> FileSystem fileSystem;</span><br><span class="line">&gt;  <span class="keyword">private</span> Configuration conf;</span><br><span class="line">&gt;  <span class="meta">@Before</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      conf=<span class="keyword">new</span> Configuration();</span><br><span class="line">&gt;      conf.addResource(<span class="string">"core-site.xml"</span>);</span><br><span class="line">&gt;      conf.addResource(<span class="string">"hdfs-site.xml"</span>);</span><br><span class="line">&gt;      fileSystem=FileSystem.newInstance(conf);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testConfig</span><span class="params">()</span></span>&#123;</span><br><span class="line">&gt;      String value = conf.get(<span class="string">"dfs.replication"</span>);</span><br><span class="line">&gt;      System.out.println(value);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpload01</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      String file=<span class="string">"C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理.pdf"</span>;</span><br><span class="line">&gt;      Path dst=<span class="keyword">new</span> Path(<span class="string">"/demo/access/springBoot.pdf"</span>);</span><br><span class="line">&gt;      InputStream is  = <span class="keyword">new</span> FileInputStream(file);</span><br><span class="line">&gt;      OutputStream os = fileSystem.create(dst, <span class="keyword">new</span> Progressable() &#123;</span><br><span class="line">&gt;          <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">progress</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&gt;              System.out.print(<span class="string">"."</span>);</span><br><span class="line">&gt;          &#125;</span><br><span class="line">&gt;      &#125;);</span><br><span class="line">&gt;      IOUtils.copyBytes(is,os,<span class="number">1024</span>,<span class="keyword">true</span>);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpload02</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Path src=<span class="keyword">new</span> Path(<span class="string">"C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理.pdf"</span>);</span><br><span class="line">&gt;      Path dst=<span class="keyword">new</span> Path(<span class="string">"/springBoot1.pdf"</span>);</span><br><span class="line">&gt;      fileSystem.copyFromLocalFile(src,dst);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDownload01</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      String file=<span class="string">"C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理1.pdf"</span>;</span><br><span class="line">&gt;      Path dst=<span class="keyword">new</span> Path(<span class="string">"/springBoot.pdf"</span>);</span><br><span class="line">&gt;      OutputStream os  = <span class="keyword">new</span> FileOutputStream(file);</span><br><span class="line">&gt;      InputStream is = fileSystem.open(dst);</span><br><span class="line">&gt;      IOUtils.copyBytes(is,os,<span class="number">1024</span>,<span class="keyword">true</span>);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDownload02</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Path dst=<span class="keyword">new</span> Path(<span class="string">"C:\\Users\\HIAPAD\\Desktop\\SpringBoot启动原理3.pdf"</span>);</span><br><span class="line">&gt;      Path src=<span class="keyword">new</span> Path(<span class="string">"/springBoot1.pdf"</span>);</span><br><span class="line">&gt;      <span class="comment">//fileSystem.copyToLocalFile(src,dst);</span></span><br><span class="line">&gt;      fileSystem.copyToLocalFile(<span class="keyword">false</span>,src,dst,<span class="keyword">true</span>);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Path src=<span class="keyword">new</span> Path(<span class="string">"/user"</span>);</span><br><span class="line">&gt; </span><br><span class="line">&gt;      fileSystem.delete(src,<span class="keyword">true</span>);<span class="comment">//true 表示递归删除子文件夹</span></span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testExists</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Path src=<span class="keyword">new</span> Path(<span class="string">"/springBoot1.pdf"</span>);</span><br><span class="line">&gt;      <span class="keyword">boolean</span> exists = fileSystem.exists(src);</span><br><span class="line">&gt;      assertTrue(exists);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMkdir</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Path src=<span class="keyword">new</span> Path(<span class="string">"/demo/access"</span>);</span><br><span class="line">&gt;      <span class="keyword">boolean</span> exists = fileSystem.exists(src);</span><br><span class="line">&gt;      <span class="keyword">if</span>(!exists)&#123;</span><br><span class="line">&gt;          fileSystem.mkdirs(src);</span><br><span class="line">&gt;      &#125;</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testListFiles</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Path src=<span class="keyword">new</span> Path(<span class="string">"/"</span>);</span><br><span class="line">&gt;      RemoteIterator&lt;LocatedFileStatus&gt; files = fileSystem.listFiles(src, <span class="keyword">true</span>);</span><br><span class="line">&gt; </span><br><span class="line">&gt;      <span class="keyword">while</span> (files.hasNext())&#123;</span><br><span class="line">&gt;          LocatedFileStatus file = files.next();</span><br><span class="line">&gt;          System.out.println(file.getPath()+<span class="string">" "</span>+file.isFile()+<span class="string">" "</span>+file.getLen());</span><br><span class="line">&gt;          BlockLocation[] locations = file.getBlockLocations();</span><br><span class="line">&gt;          <span class="keyword">for</span> (BlockLocation location : locations) &#123;</span><br><span class="line">&gt;              System.out.println(<span class="string">"offset:"</span>+location.getOffset()+<span class="string">",length:"</span>+location.getLength());</span><br><span class="line">&gt;          &#125;</span><br><span class="line">&gt;      &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@Test</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDeleteWithTrash</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      Trash trash=<span class="keyword">new</span> Trash(fileSystem,conf);</span><br><span class="line">&gt;      Path dst=<span class="keyword">new</span> Path(<span class="string">"/springBoot1.pdf"</span>);</span><br><span class="line">&gt;      trash.moveToTrash(dst);</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt;  <span class="meta">@After</span></span><br><span class="line">&gt;  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">after</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">&gt;      fileSystem.close();</span><br><span class="line">&gt;  &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt; &#125;</span><br><span class="line">&gt; </span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<h1 id="Map-Reduce"><a href="#Map-Reduce" class="headerlink" title="Map Reduce"></a>Map Reduce</h1><p>Map Reduce是一种编程模型，用于大规模数据集（大于1TB）的并行运算。 概念”Map（映射）”和”Reduce（归约）”，是它们的主要思想，都是从函数式编程(数据不动代码动)语言里借来的，还有从矢量编程(分阶段对任务划分,每个阶段实现并行)语言里借来的特性。概念”Map（映射）”和”Reduce（归约）”，是它们的主要思想，都是从函数式编程语言里借来的，还有从矢量编程语言里借来的特性。  </p>
+<p><code>MapReduce</code>是Hadoop的一个<code>并行计算框架</code>,将一个计算任务拆分成为两个阶段分别是Map阶段和Reduce阶段.Map Reduce计算框架充分利用了存储节点(datanode)所在的物理主机的计算资源(内存/CPU/网络/少许磁盘)进行并行计算.MapReduce框架会在所有的存储节点上分别启动一个Node Manager进程实现对存储节点的计算资源的管理和使用.默认情况下Node Manager会将本进程运行的物理主机的计算资源抽象成8个计算单元,每个单元称为一个<code>Container</code>,所有Node Manager都必须听从Resource Manager调度.Resource Manager负责计算资源的统筹分配.</p>
+<h2 id="Map-Reduce计算流程"><a href="#Map-Reduce计算流程" class="headerlink" title="Map Reduce计算流程"></a>Map Reduce计算流程</h2><p><img src="/2020/01/16/hadoop之hdfs/C:%5CUsers%5CLiWang%5CDesktop%5CMapReduce%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86.png" alt></p>
+<p>==Resource Manager==:统筹计算资源,管理所有NodeManager,进行资源分配</p>
+<p>==Node Manager==:管理物理主机上的计算资源<code>Container</code>,负责向RM汇报自身状态信息</p>
+<p>==MRAppMaster==:计算任务的Master,负责申请计算资源,协调计算任务.</p>
+<p>==YarnChild==:负责做实际计算的任务/进程(MapTask/ReduceTask)</p>
+<p>==Container==:是计算资源的抽象代表着一组内存/cpu/网路的占用.无论是MRAppMaster还是YarnChild运行时都需要消耗一个Container逻辑.</p>
+<h2 id="YARN环境搭建"><a href="#YARN环境搭建" class="headerlink" title="YARN环境搭建"></a>YARN环境搭建</h2><p><strong>配置文件</strong></p>
+<p><code>etc/hadoop/yarn-site.xml</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">&gt; <span class="comment">&lt;!--Resource Manager--&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.hostname<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">value</span>&gt;</span>CentOS<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><code>etc/hadoop/mapred-site.xml</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">&gt;  <span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>启动计算服务</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# start-yarn.sh </span><br><span class="line"><span class="meta">&gt;</span> [root@CentOS ~]# jps</span><br><span class="line"><span class="meta">&gt;</span> 11459 NameNode</span><br><span class="line"><span class="meta">&gt;</span> 11575 DataNode</span><br><span class="line"><span class="meta">&gt;</span> 11722 SecondaryNameNode</span><br><span class="line"><span class="meta">&gt;</span> 18492 ResourceManager</span><br><span class="line"><span class="meta">&gt;</span> 18573 NodeManager</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<blockquote>
+</blockquote>
+</blockquote>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lx-navigation">
+	<div class="lx-cover prev lx-cover-sm" style="background-image: url(/images/footer_1.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="#">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Next</span>
+						<h3>没有更新的文章</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+        <div class="lx-cover next lx-cover-sm" style="background-image: url(/images/footer_2.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2020/01/13/大数据简介以及单机搭建/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Prev</span>
+						<h3>大数据简介以及单机搭建</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+</div>
+<div class="comment"><div id="comments"></div></div>
+<footer>
+  <div>
+  Copyright &copy; 2019.<a href="/">Black eight</a><br><img src="http://dchip-web.z-chip.com/download/2020-07-24/16.37.38/%E5%A4%87%E6%A1%88%E5%9B%BE%E6%A0%87.png">京公网安备 11010802032453号<br>
+  </div>
+</footer>
+</div>
+<a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i></a>
+<div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Search..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+<button class="menu-trigger"></button>
+<div class="menu">
+  <div class="menu-head">
+    <span class="layer">
+      <div class="col">
+        <div class="row for-pic">
+          <div class="profile-pic">
+            <a href="/"><img src="/images/person_1.jpg" alt="WL"></a>
+          </div>
+        </div>
+        <div class="row for-name">
+          <p>WL</p>
+          <span class="tagline">Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride</span>
+        </div>
+      </div>
+    </span>
+  </div>
+  <nav class="menu-container">
+  <ul class="menu-items">
+    <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+    <li><a href="/archives/"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-bookmark fa-fw"></i>页面</span>
+        <ul>
+          <li><a href="/guestbook">留言</a></li>
+        <li><a href="/about">关于</a></li>
+        </ul>
+    </li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-link fa-fw"></i>友链</span>
+        <ul>
+          <li> <a href="https://lx.blleng.cn" target="_blank">Theme-Lx</a></li>
+        </ul>
+    </li>
+  </ul>
+  </nav>
+</div>
+
+<div class="gototop js-top">
+  <a href="#" class="js-gotop"><i class="fa fa-arrow-up"></i></a>
+</div>
+<script src="/js/jquery.easing.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.stellar.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/local.search.js"></script>
+<script src="//unpkg.com/valine"></script>
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YFLRL95mJxOLxyHI5EKXlr4Q-gzGzoHsz',
+    appKey: 'FO7iHJSy5vVqCIW3goFYWD5x',
+    placeholder: '此处留言',
+    avatar: 'identicon',
+    meta: guest,
+    pageSize: '10' || 10,
+    lang: 'zh-cn' || 'zh-cn'
+  });
+</script>
+
+</body>
+</html>

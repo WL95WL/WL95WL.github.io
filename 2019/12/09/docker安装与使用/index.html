@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>docker | Black eight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="WL">
+  <meta name="keywords" content>
+  <meta name="description" content="Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride">
+  <script id="hexo-configurations">
+  var CONFIG = {
+    root: '/',
+    theme: 'hexo-theme-lx',
+    version: '1.4.5',
+    localsearch:{
+      "enable": true,
+      "trigger": "auto",
+      "top_n_per_article": 1,
+      "unescape": false,
+      "preload": false
+      },
+    path: 'search.xml'
+  };
+</script>
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery.jside.menu.js"></script>
+	<script>
+	$(document).ready(function(){
+	$(".menu-container").jSideMenu({
+	    jSidePosition: "position-right",
+	    jSideSticky: true,
+	    jSideSkin: "endless-river",
+	     });
+	}); 
+	</script>
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300|Noto+Serif+SC&amp;display=swap">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+</head>
+<body>
+<div class="single">
+<div id="page">
+<div id="lx-aside" style="background-image: url(/images/page-cover.jpg)" data-stellar-background-ratio="0.5">
+  <div class="overlay">
+  <div class="page-title">
+    <div class="avatar"><a href="/"><img src="/images/person_1.jpg"></a></div>
+    <span>2019-12-09</span>
+    <h2>docker</h2>
+    <div class="tags"><i class="fa fa-tag"></i><a class="tag-link" href="/tags/docker/">docker</a></div>
+    </div>
+</div>
+</div>
+<div id="lx-main-content">
+  <div class="lx-post">
+    <div class="lx-entry padding">
+      <div>
+        <h1 id="docker安装与使用"><a href="#docker安装与使用" class="headerlink" title="docker安装与使用"></a>docker安装与使用</h1><h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h2><p>centOS7</p>
+<p>安装gcc</p>
+<p>[root@localhost ~]# yum -y install gcc</p>
+<p>安装gcc-c++</p>
+<p>[root@localhost ~]# yum -y install gcc-c++<br>验证gcc是否安装成功[root@localhost ~]#gcc -v<br>————————————————<br><a href="https://blog.csdn.net/li1325169021/article/details/90780627" target="_blank" rel="noopener">https://blog.csdn.net/li1325169021/article/details/90780627</a></p>
+<p>如果已安装docker，需要先卸载旧版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">yum remove docker \</span><br><span class="line">                 docker-client \</span><br><span class="line">                 docker-client-latest \</span><br><span class="line">                 docker-common \</span><br><span class="line">                 docker-latest \</span><br><span class="line">                 docker-latest-logrotate \</span><br><span class="line">                 docker-logrotate \</span><br><span class="line">                 docker-engine</span><br></pre></td></tr></table></figure>
+
+<p>安装所需要的软件包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install -y yum-utils \</span><br><span class="line"> device-mapper-persistent-data \</span><br><span class="line"> lvm2</span><br></pre></td></tr></table></figure>
+
+<h6 id="添加软件源信息"><a href="#添加软件源信息" class="headerlink" title="添加软件源信息"></a>添加软件源信息</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br></pre></td></tr></table></figure>
+
+<h6 id="更新并安装-Docker-CE"><a href="#更新并安装-Docker-CE" class="headerlink" title="更新并安装 Docker-CE"></a>更新并安装 Docker-CE</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">更新yum软件包索引</span><br><span class="line">yum makecache fast</span><br><span class="line">安装</span><br><span class="line"> yum -y install docker-ce</span><br></pre></td></tr></table></figure>
+
+<h6 id="开启Docker服务"><a href="#开启Docker服务" class="headerlink" title="开启Docker服务"></a>开启Docker服务</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">service docker start</span><br><span class="line">systemctl start docker</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-Docker-hello-world"><a href="#2-Docker-hello-world" class="headerlink" title="2.Docker hello world"></a>2.Docker hello world</h2><p>使用docker run 在容器内启动一个应用程序</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run ubuntu:15.10 /bin/echo "Hello world"</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>docker:</strong> Docker 的二进制执行文件。</li>
+<li><strong>run:</strong> 与前面的 docker 组合来运行一个容器。</li>
+<li><strong>ubuntu:15.10</strong> 指定要运行的镜像，Docker 首先从本地主机上查找镜像是否存在，如果不存在，Docker 就会从镜像仓库 Docker Hub 下载公共镜像。</li>
+<li><strong>/bin/echo “Hello world”:</strong> 在启动的容器里执行的命令</li>
+</ul>
+<p>运行交互式容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run -i -t ubuntu:15.10 /bin/bash</span><br><span class="line">-t:在新容器内指定一个终端或伪终端</span><br><span class="line">-i:允许对容器内的标准输入进行交互</span><br><span class="line">/bin/bash：放在镜像名后的是命令，这里我们希望有个交互式 Shell，因此用的是 /bin/bash。</span><br><span class="line">出现 '：/#' 表示进入  ubuntu:15.10 容器</span><br><span class="line">cat /proc/version:查看当前系统的版本信息</span><br><span class="line">ls 查看文件</span><br><span class="line">exit /ctrl+D  退出</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动容器（后台模式）"><a href="#启动容器（后台模式）" class="headerlink" title="启动容器（后台模式）"></a>启动容器（后台模式）</h2><p>使用以下命令创建一个以进程方式运行的容器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker run -d ubuntu:15.10 /bin/sh -c &quot;while true; do echo hello world; sleep 1; done&quot;</span><br><span class="line">2b1b7a428627c51ab8810d541d759f072b4fc75487eed05812646b8534a2fe63</span><br></pre></td></tr></table></figure>
+
+<p>在输出中，我们没有看到期望的 “hello world”，而是一串长字符</p>
+<p><strong>2b1b7a428627c51ab8810d541d759f072b4fc75487eed05812646b8534a2fe63</strong></p>
+<p>这个长字符串叫做容器 ID，对每个容器来说都是唯一的，我们可以通过容器 ID 来查看对应的容器发生了什么。</p>
+<p>首先，我们需要确认容器有在运行，可以通过 <strong>docker ps</strong> 来查看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE                  COMMAND              ...  </span><br><span class="line">5917eac21c36        ubuntu:15.10           &quot;/bin/sh -c &apos;while t…&quot;    ...</span><br></pre></td></tr></table></figure>
+
+<p>输出详情介绍：</p>
+<p><strong>CONTAINER ID:</strong> 容器 ID。</p>
+<p><strong>IMAGE:</strong> 使用的镜像。</p>
+<p><strong>COMMAND:</strong> 启动容器时运行的命令。</p>
+<p><strong>CREATED:</strong> 容器的创建时间。</p>
+<p><strong>STATUS:</strong> 容器状态。</p>
+<p>状态有7种：</p>
+<ul>
+<li>created（已创建）</li>
+<li>restarting（重启中）</li>
+<li>running（运行中）</li>
+<li>removing（迁移中）</li>
+<li>paused（暂停）</li>
+<li>exited（停止）</li>
+<li>dead（死亡）</li>
+</ul>
+<p><strong>PORTS:</strong> 容器的端口信息和使用的连接类型（tcp\udp）。</p>
+<p><strong>NAMES:</strong> 自动分配的容器名称。</p>
+<h2 id="常用命令："><a href="#常用命令：" class="headerlink" title="常用命令："></a>常用命令：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"> 在容器内使用 docker logs 命令，查看容器内的标准输出</span><br><span class="line"> docker logs +ID</span><br><span class="line">docker logs +容器名称</span><br><span class="line"></span><br><span class="line">使用ubuntu镜像启动一个容器</span><br><span class="line">$ docker run -it ubuntu /bin/bash</span><br><span class="line">查看所有容器</span><br><span class="line">docker ps -a</span><br><span class="line">启动一个已停止的容器</span><br><span class="line">docker start +id</span><br><span class="line">后台运行</span><br><span class="line">在大部分的场景下，我们希望 docker 的服务是在后台运行的，我们可以过 -d 指定容器的运行模式。</span><br><span class="line">$ docker run -itd --name ubuntu-test ubuntu /bin/bash</span><br><span class="line">停止</span><br><span class="line">docker stop +Id</span><br><span class="line">docker stop +name</span><br><span class="line">重启</span><br><span class="line">docker restart+id</span><br><span class="line">后台启动时</span><br><span class="line">进入容器：</span><br><span class="line">docker attach</span><br><span class="line">使用：docker attach +id</span><br><span class="line">docker exec  使用 docker exec 命令，因为此退出容器终端，不会导致容器的停止。</span><br><span class="line">docker exec -it +id /bin/bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="导出和导入容器"><a href="#导出和导入容器" class="headerlink" title="导出和导入容器"></a>导出和导入容器</h3><p><strong>导出容器</strong></p>
+<p>如果要导出本地某个容器，可以使用 <strong>docker export</strong> 命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker export 1e560fca3906 &gt; ubuntu.tar</span><br></pre></td></tr></table></figure>
+
+<p>导出容器 1e560fca3906 快照到本地文件 ubuntu.tar。</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2016/05/docker-export.png" alt="img"></p>
+<p>这样将导出容器快照到本地文件。</p>
+<p><strong>导入容器快照</strong></p>
+<p>可以使用 docker import 从容器快照文件中再导入为镜像，以下实例将快照文件 ubuntu.tar 导入到镜像 test/ubuntu:v1:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cat docker/ubuntu.tar | docker import - test/ubuntu:v1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://www.runoob.com/wp-content/uploads/2016/05/docker-import.png" alt="img"></p>
+<p>此外，也可以通过指定 URL 或者某个目录来导入，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker import http://example.com/exampleimage.tgz example/imagerepo</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><p>删除容器使用 <strong>docker rm</strong> 命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rm -f 1e560fca3906</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://www.runoob.com/wp-content/uploads/2016/05/docker-container-rmi.png" alt="img"></p>
+<p>下面的命令可以清理掉所有处于终止状态的容器。</p>
+<p>$ docker container prune</p>
+<h2 id="运行一个-web-应用"><a href="#运行一个-web-应用" class="headerlink" title="运行一个 web 应用"></a>运行一个 web 应用</h2><p>前面我们运行的容器并没有一些什么特别的用处。</p>
+<p>接下来让我们尝试使用 docker 构建一个 web 应用程序。</p>
+<p>我们将在docker容器中运行一个 Python Flask 应用来运行一个web应用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~# docker pull training/webapp  # 载入镜像</span><br><span class="line">runoob@runoob:~# docker run -d -P training/webapp python app.py</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://www.runoob.com/wp-content/uploads/2016/05/docker29.png" alt="img"></p>
+<p>参数说明:</p>
+<ul>
+<li><strong>-d:</strong>让容器在后台运行。</li>
+<li><strong>-P:</strong>将容器内部使用的网络端口映射到我们使用的主机上。</li>
+</ul>
+<hr>
+<h2 id="查看-WEB-应用容器"><a href="#查看-WEB-应用容器" class="headerlink" title="查看 WEB 应用容器"></a>查看 WEB 应用容器</h2><p>使用 docker ps 来查看我们正在运行的容器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~#  docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             ...        PORTS                 </span><br><span class="line">d3d5e39ed9d3        training/webapp     &quot;python app.py&quot;     ...        0.0.0.0:32769-&gt;5000/tcp</span><br></pre></td></tr></table></figure>
+
+<p>这里多了端口信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PORTS</span><br><span class="line">0.0.0.0:32769-&gt;5000/tcp</span><br></pre></td></tr></table></figure>
+
+<p>Docker 开放了 5000 端口（默认 Python Flask 端口）映射到主机端口 32769 上。</p>
+<p>这时我们可以通过浏览器访问WEB应用</p>
+<p><img src="https://www.runoob.com/wp-content/uploads/2016/05/docker31.png" alt="img"></p>
+<p>我们也可以通过 -p 参数来设置不一样的端口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker run -d -p 5000:5000 training/webapp python app.py</span><br></pre></td></tr></table></figure>
+
+<p><strong>docker ps</strong>查看正在运行的容器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~#  docker ps</span><br><span class="line">CONTAINER ID        IMAGE                             PORTS                     NAMES</span><br><span class="line">bf08b7f2cd89        training/webapp     ...        0.0.0.0:5000-&gt;5000/tcp    wizardly_chandrasekhar</span><br><span class="line">d3d5e39ed9d3        training/webapp     ...        0.0.0.0:32769-&gt;5000/tcp   xenodochial_hoov</span><br></pre></td></tr></table></figure>
+
+<p>容器内部的 5000 端口映射到我们本地主机的 5000 端口上。</p>
+<hr>
+<h2 id="网络端口的快捷方式"><a href="#网络端口的快捷方式" class="headerlink" title="网络端口的快捷方式"></a>网络端口的快捷方式</h2><p>通过 <strong>docker ps</strong> 命令可以查看到容器的端口映射，<strong>docker</strong> 还提供了另一个快捷方式 <strong>docker port</strong>，使用 <strong>docker port</strong> 可以查看指定 （ID 或者名字）容器的某个确定端口映射到宿主机的端口号。</p>
+<p>上面我们创建的 web 应用容器 ID 为 <strong>bf08b7f2cd89</strong> 名字为 <strong>wizardly_chandrasekhar</strong>。</p>
+<p>我可以使用 <strong>docker port bf08b7f2cd89</strong> 或 <strong>docker port wizardly_chandrasekhar</strong> 来查看容器端口的映射情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker port bf08b7f2cd89</span><br><span class="line">5000/tcp -&gt; 0.0.0.0:5000</span><br><span class="line">runoob@runoob:~$ docker port wizardly_chandrasekhar</span><br><span class="line">5000/tcp -&gt; 0.0.0.0:5000</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="查看-WEB-应用程序日志"><a href="#查看-WEB-应用程序日志" class="headerlink" title="查看 WEB 应用程序日志"></a>查看 WEB 应用程序日志</h2><p>docker logs [ID或者名字] 可以查看容器内部的标准输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker logs -f bf08b7f2cd89</span><br><span class="line"> * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)</span><br><span class="line">192.168.239.1 - - [09/May/2016 16:30:37] &quot;GET / HTTP/1.1&quot; 200 -</span><br><span class="line">192.168.239.1 - - [09/May/2016 16:30:37] &quot;GET /favicon.ico HTTP/1.1&quot; 404 -</span><br></pre></td></tr></table></figure>
+
+<p><strong>-f:</strong> 让 <strong>docker logs</strong> 像使用 <strong>tail -f</strong> 一样来输出容器内部的标准输出。</p>
+<p>从上面，我们可以看到应用程序使用的是 5000 端口并且能够查看到应用程序的访问日志。</p>
+<hr>
+<h2 id="查看WEB应用程序容器的进程"><a href="#查看WEB应用程序容器的进程" class="headerlink" title="查看WEB应用程序容器的进程"></a>查看WEB应用程序容器的进程</h2><p>我们还可以使用 docker top 来查看容器内部运行的进程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker top wizardly_chandrasekhar</span><br><span class="line">UID     PID         PPID          ...       TIME                CMD</span><br><span class="line">root    23245       23228         ...       00:00:00            python app.py</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="检查-WEB-应用程序"><a href="#检查-WEB-应用程序" class="headerlink" title="检查 WEB 应用程序"></a>检查 WEB 应用程序</h2><p>使用 <strong>docker inspect</strong> 来查看 Docker 的底层信息。它会返回一个 JSON 文件记录着 Docker 容器的配置和状态信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker inspect wizardly_chandrasekhar</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;Id&quot;: &quot;bf08b7f2cd897b5964943134aa6d373e355c286db9b9885b1f60b6e8f82b2b85&quot;,</span><br><span class="line">        &quot;Created&quot;: &quot;2018-09-17T01:41:26.174228707Z&quot;,</span><br><span class="line">        &quot;Path&quot;: &quot;python&quot;,</span><br><span class="line">        &quot;Args&quot;: [</span><br><span class="line">            &quot;app.py&quot;</span><br><span class="line">        ],</span><br><span class="line">        &quot;State&quot;: &#123;</span><br><span class="line">            &quot;Status&quot;: &quot;running&quot;,</span><br><span class="line">            &quot;Running&quot;: true,</span><br><span class="line">            &quot;Paused&quot;: false,</span><br><span class="line">            &quot;Restarting&quot;: false,</span><br><span class="line">            &quot;OOMKilled&quot;: false,</span><br><span class="line">            &quot;Dead&quot;: false,</span><br><span class="line">            &quot;Pid&quot;: 23245,</span><br><span class="line">            &quot;ExitCode&quot;: 0,</span><br><span class="line">            &quot;Error&quot;: &quot;&quot;,</span><br><span class="line">            &quot;StartedAt&quot;: &quot;2018-09-17T01:41:26.494185806Z&quot;,</span><br><span class="line">            &quot;FinishedAt&quot;: &quot;0001-01-01T00:00:00Z&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="停止-WEB-应用容器"><a href="#停止-WEB-应用容器" class="headerlink" title="停止 WEB 应用容器"></a>停止 WEB 应用容器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker stop wizardly_chandrasekhar   </span><br><span class="line">wizardly_chandrasekhar</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="重启WEB应用容器"><a href="#重启WEB应用容器" class="headerlink" title="重启WEB应用容器"></a>重启WEB应用容器</h2><p>已经停止的容器，我们可以使用命令 docker start 来启动。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker start wizardly_chandrasekhar</span><br><span class="line">wizardly_chandrasekhar</span><br></pre></td></tr></table></figure>
+
+<p>docker ps -l 查询最后一次创建的容器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#  docker ps -l </span><br><span class="line">CONTAINER ID        IMAGE                             PORTS                     NAMES</span><br><span class="line">bf08b7f2cd89        training/webapp     ...        0.0.0.0:5000-&gt;5000/tcp    wizardly_chandrasekhar</span><br></pre></td></tr></table></figure>
+
+<p>正在运行的容器，我们可以使用 <strong>docker restart</strong> 命令来重启。</p>
+<hr>
+<h2 id="移除WEB应用容器"><a href="#移除WEB应用容器" class="headerlink" title="移除WEB应用容器"></a>移除WEB应用容器</h2><p>我们可以使用 docker rm 命令来删除不需要的容器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker rm wizardly_chandrasekhar  </span><br><span class="line">wizardly_chandrasekhar</span><br></pre></td></tr></table></figure>
+
+<p>删除容器时，容器必须是停止状态，否则会报如下错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">runoob@runoob:~$ docker rm wizardly_chandrasekhar</span><br><span class="line">Error response from daemon: You cannot remove a running container bf08b7f2cd897b5964943134aa6d373e355c286db9b9885b1f60b6e8f82b2b85. Stop the container before attempting removal or force remove</span><br></pre></td></tr></table></figure>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lx-navigation">
+	<div class="lx-cover prev lx-cover-sm" style="background-image: url(/images/footer_1.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2020/01/10/jenkins-svn-maven持续集成/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Next</span>
+						<h3>jenkins+svn+maven持续集成</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+        <div class="lx-cover next lx-cover-sm" style="background-image: url(/images/footer_2.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2019/12/09/docker概念/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Prev</span>
+						<h3>docker</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+</div>
+<div class="comment"><div id="comments"></div></div>
+<footer>
+  <div>
+  Copyright &copy; 2019.<a href="/">Black eight</a><br><img src="http://dchip-web.z-chip.com/download/2020-07-24/16.37.38/%E5%A4%87%E6%A1%88%E5%9B%BE%E6%A0%87.png">京公网安备 11010802032453号<br>
+  </div>
+</footer>
+</div>
+<a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i></a>
+<div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Search..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+<button class="menu-trigger"></button>
+<div class="menu">
+  <div class="menu-head">
+    <span class="layer">
+      <div class="col">
+        <div class="row for-pic">
+          <div class="profile-pic">
+            <a href="/"><img src="/images/person_1.jpg" alt="WL"></a>
+          </div>
+        </div>
+        <div class="row for-name">
+          <p>WL</p>
+          <span class="tagline">Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride</span>
+        </div>
+      </div>
+    </span>
+  </div>
+  <nav class="menu-container">
+  <ul class="menu-items">
+    <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+    <li><a href="/archives/"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-bookmark fa-fw"></i>页面</span>
+        <ul>
+          <li><a href="/guestbook">留言</a></li>
+        <li><a href="/about">关于</a></li>
+        </ul>
+    </li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-link fa-fw"></i>友链</span>
+        <ul>
+          <li> <a href="https://lx.blleng.cn" target="_blank">Theme-Lx</a></li>
+        </ul>
+    </li>
+  </ul>
+  </nav>
+</div>
+
+<div class="gototop js-top">
+  <a href="#" class="js-gotop"><i class="fa fa-arrow-up"></i></a>
+</div>
+<script src="/js/jquery.easing.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.stellar.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/local.search.js"></script>
+<script src="//unpkg.com/valine"></script>
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YFLRL95mJxOLxyHI5EKXlr4Q-gzGzoHsz',
+    appKey: 'FO7iHJSy5vVqCIW3goFYWD5x',
+    placeholder: '此处留言',
+    avatar: 'identicon',
+    meta: guest,
+    pageSize: '10' || 10,
+    lang: 'zh-cn' || 'zh-cn'
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>NoSql相关知识 | Black eight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="WL">
+  <meta name="keywords" content>
+  <meta name="description" content="Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride">
+  <script id="hexo-configurations">
+  var CONFIG = {
+    root: '/',
+    theme: 'hexo-theme-lx',
+    version: '1.4.5',
+    localsearch:{
+      "enable": true,
+      "trigger": "auto",
+      "top_n_per_article": 1,
+      "unescape": false,
+      "preload": false
+      },
+    path: 'search.xml'
+  };
+</script>
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery.jside.menu.js"></script>
+	<script>
+	$(document).ready(function(){
+	$(".menu-container").jSideMenu({
+	    jSidePosition: "position-right",
+	    jSideSticky: true,
+	    jSideSkin: "endless-river",
+	     });
+	}); 
+	</script>
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300|Noto+Serif+SC&amp;display=swap">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+</head>
+<body>
+<div class="single">
+<div id="page">
+<div id="lx-aside" style="background-image: url(/images/page-cover.jpg)" data-stellar-background-ratio="0.5">
+  <div class="overlay">
+  <div class="page-title">
+    <div class="avatar"><a href="/"><img src="/images/person_1.jpg"></a></div>
+    <span>2020-01-13</span>
+    <h2>NoSql相关知识</h2>
+    <div class="tags"><i class="fa fa-tag"></i><a class="tag-link" href="/tags/NoSql/">NoSql</a></div>
+    </div>
+</div>
+</div>
+<div id="lx-main-content">
+  <div class="lx-post">
+    <div class="lx-entry padding">
+      <div>
+        <h1 id="NoSQL-简介"><a href="#NoSQL-简介" class="headerlink" title="NoSQL 简介"></a>NoSQL 简介</h1><p>NoSQL(NoSQL = Not Only SQL )，意即”不仅仅是SQL”。</p>
+<p>在现代的计算系统上每天网络上都会产生庞大的数据量。</p>
+<p>这些数据有很大一部分是由关系数据库管理系统（RDBMS）来处理。 1970年 E.F.Codd’s提出的关系模型的论文 “A relational model of data for large shared data banks”，这使得数据建模和应用程序编程更加简单。</p>
+<p>通过应用实践证明，关系模型是非常适合于客户服务器编程，远远超出预期的利益，今天它是结构化数据存储在网络和商务应用的主导技术。</p>
+<p>NoSQL 是一项全新的数据库革命性运动，早期就有人提出，发展至2009年趋势越发高涨。NoSQL的拥护者们提倡运用非关系型的数据存储，相对于铺天盖地的关系型数据库运用，这一概念无疑是一种全新的思维的注入。</p>
+<h2 id="关系型数据库遵循ACID规则"><a href="#关系型数据库遵循ACID规则" class="headerlink" title="关系型数据库遵循ACID规则"></a>关系型数据库遵循ACID规则</h2><p>事务在英文中是transaction，和现实世界中的交易很类似，它有如下四个特性：</p>
+<p><strong>1、A (Atomicity) 原子性</strong></p>
+<p>原子性很容易理解，也就是说事务里的所有操作要么全部做完，要么都不做，事务成功的条件是事务里的所有操作都成功，只要有一个操作失败，整个事务就失败，需要回滚。</p>
+<p>比如银行转账，从A账户转100元至B账户，分为两个步骤：1）从A账户取100元；2）存入100元至B账户。这两步要么一起完成，要么一起不完成，如果只完成第一步，第二步失败，钱会莫名其妙少了100元。</p>
+<p><strong>2、C (Consistency) 一致性</strong></p>
+<p>一致性也比较容易理解，也就是说数据库要一直处于一致的状态，事务的运行不会改变数据库原本的一致性约束。</p>
+<p>例如现有完整性约束a+b=10，如果一个事务改变了a，那么必须得改变b，使得事务结束后依然满足a+b=10，否则事务失败。</p>
+<p><strong>3、I (Isolation) 独立性</strong></p>
+<p>所谓的独立性是指并发的事务之间不会互相影响，如果一个事务要访问的数据正在被另外一个事务修改，只要另外一个事务未提交，它所访问的数据就不受未提交事务的影响。</p>
+<p>比如现在有个交易是从A账户转100元至B账户，在这个交易还未完成的情况下，如果此时B查询自己的账户，是看不到新增加的100元的。</p>
+<p><strong>4、D (Durability) 持久性</strong></p>
+<p>持久性是指一旦事务提交后，它所做的修改将会永久的保存在数据库上，即使出现宕机也不会丢失。</p>
+<h2 id="分布式系统"><a href="#分布式系统" class="headerlink" title="分布式系统"></a>分布式系统</h2><p>分布式系统（distributed system）由多台计算机和通信的软件组件通过计算机网络连接（本地网络或广域网）组成。</p>
+<p>分布式系统是建立在网络之上的软件系统。正是因为软件的特性，所以分布式系统具有高度的内聚性和透明性。</p>
+<p>因此，网络和分布式系统之间的区别更多的在于高层软件（特别是操作系统），而不是硬件。</p>
+<p>分布式系统可以应用在不同的平台上如：Pc、工作站、局域网和广域网上等。</p>
+<h2 id="分布式计算的优点"><a href="#分布式计算的优点" class="headerlink" title="分布式计算的优点"></a>分布式计算的优点</h2><p><strong>可靠性（容错） ：</strong></p>
+<p>分布式计算系统中的一个重要的优点是可靠性。一台服务器的系统崩溃并不影响到其余的服务器。</p>
+<p><strong>可扩展性：</strong></p>
+<p>在分布式计算系统可以根据需要增加更多的机器。</p>
+<p><strong>资源共享：</strong></p>
+<p>共享数据是必不可少的应用，如银行，预订系统。</p>
+<p><strong>灵活性：</strong></p>
+<p>由于该系统是非常灵活的，它很容易安装，实施和调试新的服务。</p>
+<p><strong>更快的速度：</strong></p>
+<p>分布式计算系统可以有多台计算机的计算能力，使得它比其他系统有更快的处理速度。</p>
+<p><strong>开放系统：</strong></p>
+<p>由于它是开放的系统，本地或者远程都可以访问到该服务。</p>
+<p><strong>更高的性能：</strong></p>
+<p>相较于集中式计算机网络集群可以提供更高的性能（及更好的性价比）。</p>
+<h2 id="分布式计算的缺点"><a href="#分布式计算的缺点" class="headerlink" title="分布式计算的缺点"></a>分布式计算的缺点</h2><p><strong>故障排除：</strong></p>
+<p>故障排除和诊断问题。</p>
+<p><strong>软件：</strong></p>
+<p>更少的软件支持是分布式计算系统的主要缺点。</p>
+<p><strong>网络：</strong></p>
+<p>网络基础设施的问题，包括：传输问题，高负载，信息丢失等。</p>
+<p><strong>安全性：</strong></p>
+<p>开放系统的特性让分布式计算系统存在着数据的安全性和共享的风险等问题。</p>
+<h2 id="什么是NoSQL"><a href="#什么是NoSQL" class="headerlink" title="什么是NoSQL?"></a>什么是NoSQL?</h2><p>NoSQL，指的是非关系型的数据库。NoSQL有时也称作Not Only SQL的缩写，是对不同于传统的关系型数据库的数据库管理系统的统称。</p>
+<p>NoSQL用于超大规模数据的存储。（例如谷歌或Facebook每天为他们的用户收集万亿比特的数据）。这些类型的数据存储不需要固定的模式，无需多余操作就可以横向扩展。</p>
+<h2 id="为什么使用NoSQL"><a href="#为什么使用NoSQL" class="headerlink" title="为什么使用NoSQL ?"></a>为什么使用NoSQL ?</h2><p>今天我们可以通过第三方平台（如：Google,Facebook等）可以很容易的访问和抓取数据。用户的个人信息，社交网络，地理位置，用户生成的数据和用户操作日志已经成倍的增加。我们如果要对这些用户数据进行挖掘，那SQL数据库已经不适合这些应用了, NoSQL 数据库的发展却能很好的处理这些大的数据。</p>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>社会化关系网:</p>
+<p>Each record: UserID1, UserID2<br>Separate records: UserID, first_name,last_name, age, gender,…<br>Task: Find all friends of friends of friends of … friends of a given user.</p>
+<p>Wikipedia 页面 :</p>
+<p>Large collection of documents<br>Combination of structured and unstructured data<br>Task: Retrieve all pages regarding athletics of Summer Olympic before 1950.</p>
+<h2 id="RDBMS-vs-NoSQL"><a href="#RDBMS-vs-NoSQL" class="headerlink" title="RDBMS vs NoSQL"></a>RDBMS vs NoSQL</h2><p>RDBMS</p>
+<ul>
+<li>高度组织化结构化数据</li>
+<li>结构化查询语言（SQL） (SQL)</li>
+<li>数据和关系都存储在单独的表中。</li>
+<li>数据操纵语言，数据定义语言</li>
+<li>严格的一致性</li>
+<li>基础事务</li>
+</ul>
+<p>NoSQL</p>
+<ul>
+<li>代表着不仅仅是SQL</li>
+<li>没有声明性查询语言</li>
+<li>没有预定义的模式<br>-键 - 值对存储，列存储，文档存储，图形数据库</li>
+<li>最终一致性，而非ACID属性</li>
+<li>非结构化和不可预知的数据</li>
+<li>CAP定理</li>
+<li>高性能，高可用性和可伸缩性</li>
+</ul>
+<h2 id="NoSQL-简史"><a href="#NoSQL-简史" class="headerlink" title="NoSQL 简史"></a>NoSQL 简史</h2><p>NoSQL一词最早出现于1998年，是Carlo Strozzi开发的一个轻量、开源、不提供SQL功能的关系数据库。</p>
+<p>2009年，Last.fm的Johan Oskarsson发起了一次关于分布式开源数据库的讨论[2]，来自Rackspace的Eric Evans再次提出了NoSQL的概念，这时的NoSQL主要指非关系型、分布式、不提供ACID的数据库设计模式。</p>
+<p>2009年在亚特兰大举行的”no:sql(east)”讨论会是一个里程碑，其口号是”select fun, profit from real_world where relational=false;”。因此，对NoSQL最普遍的解释是”非关联型的”，强调Key-Value Stores和文档数据库的优点，而不是单纯的反对RDBMS。</p>
+<h2 id="CAP定理（CAP-theorem）"><a href="#CAP定理（CAP-theorem）" class="headerlink" title="CAP定理（CAP theorem）"></a>CAP定理（CAP theorem）</h2><p>在计算机科学中, CAP定理（CAP theorem）, 又被称作 布鲁尔定理（Brewer’s theorem）, 它指出对于一个分布式计算系统来说，不可能同时满足以下三点:</p>
+<ul>
+<li><strong>一致性(Consistency)</strong> (所有节点在同一时间具有相同的数据)</li>
+<li><strong>可用性(Availability)</strong> (保证每个请求不管成功或者失败都有响应)</li>
+<li><strong>分隔容忍(Partition tolerance)</strong> (系统中任意信息的丢失或失败不会影响系统的继续运作)</li>
+</ul>
+<p>CAP理论的核心是：一个分布式系统不可能同时很好的满足一致性，可用性和分区容错性这三个需求，最多只能同时较好的满足两个。</p>
+<p>因此，根据 CAP 原理将 NoSQL 数据库分成了满足 CA 原则、满足 CP 原则和满足 AP 原则三 大类：</p>
+<ul>
+<li>CA - 单点集群，满足一致性，可用性的系统，通常在可扩展性上不太强大。</li>
+<li>CP - 满足一致性，分区容忍性的系统，通常性能不是特别高。</li>
+<li>AP - 满足可用性，分区容忍性的系统，通常可能对一致性要求低一些。</li>
+</ul>
+<h2 id="NoSQL的优点-缺点"><a href="#NoSQL的优点-缺点" class="headerlink" title="NoSQL的优点/缺点"></a>NoSQL的优点/缺点</h2><p>优点:</p>
+<ul>
+<li>- 高可扩展性</li>
+<li>- 分布式计算</li>
+<li>- 低成本</li>
+<li>- 架构的灵活性，半结构化数据</li>
+<li>- 没有复杂的关系</li>
+</ul>
+<p>缺点:</p>
+<ul>
+<li>- 没有标准化</li>
+<li>- 有限的查询功能（到目前为止）</li>
+<li>- 最终一致是不直观的程序</li>
+</ul>
+<h2 id="BASE"><a href="#BASE" class="headerlink" title="BASE"></a>BASE</h2><p>BASE：Basically Available, Soft-state, Eventually Consistent。 由 Eric Brewer 定义。</p>
+<p>CAP理论的核心是：一个分布式系统不可能同时很好的满足一致性，可用性和分区容错性这三个需求，最多只能同时较好的满足两个。</p>
+<p>BASE是NoSQL数据库通常对可用性及一致性的弱要求原则:</p>
+<ul>
+<li>Basically Availble –基本可用</li>
+<li>Soft-state –软状态/柔性事务。 “Soft state” 可以理解为”无连接”的, 而 “Hard state” 是”面向连接”的</li>
+<li>Eventual Consistency – 最终一致性， 也是是 ACID 的最终目的。</li>
+</ul>
+<h2 id="ACID-vs-BASE"><a href="#ACID-vs-BASE" class="headerlink" title="ACID vs BASE"></a>ACID vs BASE</h2><table>
+<thead>
+<tr>
+<th>ACID</th>
+<th>BASE</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原子性(<strong>A</strong>tomicity)</td>
+<td>基本可用(<strong>B</strong>asically <strong>A</strong>vailable)</td>
+</tr>
+<tr>
+<td>一致性(<strong>C</strong>onsistency)</td>
+<td>软状态/柔性事务(<strong>S</strong>oft state)</td>
+</tr>
+<tr>
+<td>隔离性(<strong>I</strong>solation)</td>
+<td>最终一致性 (<strong>E</strong>ventual consistency)</td>
+</tr>
+<tr>
+<td>持久性 (<strong>D</strong>urable)</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="NoSQL-数据库分类"><a href="#NoSQL-数据库分类" class="headerlink" title="NoSQL 数据库分类"></a>NoSQL 数据库分类</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>部分代表</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>列存储</td>
+<td>Hbase    Cassandra Hypertable</td>
+<td>顾名思义，是按列存储数据的。最大的特点是方便存储结构化和半结构化数据，方便做数据压缩，对针对某一列或者某几列的查询有非常大的IO优势。</td>
+</tr>
+<tr>
+<td>文档存储</td>
+<td>MongoDB  CouchDB</td>
+<td>文档存储一般用类似json的格式存储，存储的内容是文档型的。这样也就有机会对某些字段建立索引，实现关系数据库的某些功能。</td>
+</tr>
+<tr>
+<td>key-value存储</td>
+<td>Tokyo Cabinet / TyrantBerkeley DBMemcacheDBRedis</td>
+<td>可以通过key快速查询到其value。一般来说，存储不管value的格式，照单全收。（Redis包含了其他功能）</td>
+</tr>
+<tr>
+<td>图形存储</td>
+<td>Neo4JFlockDB</td>
+<td>图形关系的最佳存储。使用传统关系数据库来解决的话性能低下，而且设计使用不方便。</td>
+</tr>
+<tr>
+<td>对象存储</td>
+<td>db4oVersant</td>
+<td>通过类似面向对象语言的语法操作数据库，通过对象的方式存取数据。</td>
+</tr>
+<tr>
+<td>xml数据库</td>
+<td>Berkeley DB XMLBaseX</td>
+<td>高效的存储XML数据，并支持XML的内部查询语法，比如XQuery,Xpath。</td>
+</tr>
+</tbody></table>
+<h2 id="不同分类特点对比"><a href="#不同分类特点对比" class="headerlink" title="不同分类特点对比"></a>不同分类特点对比</h2><table>
+<thead>
+<tr>
+<th><strong>分类</strong></th>
+<th><strong>Examples举例</strong></th>
+<th>典型应用场景</th>
+<th>数据模型</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>键值（key-value）</strong></td>
+<td>Tokyo Cabinet/Tyrant， Redis， Voldemort， Oracle BDB</td>
+<td>内容缓存，主要用于处理大量数据的高访问负载，也用于一些日志系统等等。</td>
+<td>Key 指向 Value 的键值对，通常用hash table来实现</td>
+<td>查找速度快</td>
+<td>数据无结构化，通常只被当作字符串或者二进制数据</td>
+</tr>
+<tr>
+<td><strong>列存储数据库</strong></td>
+<td>Cassandra， HBase， Riak</td>
+<td>分布式的文件系统</td>
+<td>以列簇式存储，将同一列数据存在一起</td>
+<td>查找速度快，可扩展性强，更容易进行分布式扩展</td>
+<td>功能相对局限</td>
+</tr>
+<tr>
+<td><strong>文档型数据库</strong></td>
+<td>CouchDB， MongoDb</td>
+<td>Web应用（与Key-Value类似，Value是结构化的，不同的是数据库能够了解Value的内容）</td>
+<td>Key-Value对应的键值对，Value为结构化数据</td>
+<td>数据结构要求不严格，表结构可变，不需要像关系型数据库一样需要预先定义表结构</td>
+<td>查询性能不高，而且缺乏统一的查询语法。</td>
+</tr>
+<tr>
+<td><strong>图形(Graph)数据库</strong></td>
+<td>Neo4J， InfoGrid， Infinite Graph</td>
+<td>社交网络，推荐系统等。专注于构建关系图谱</td>
+<td>图结构</td>
+<td>利用图结构相关算法。比如最短路径寻址，N度关系查找等</td>
+<td>很多时候需要对整个图做计算才能得出需要的信息，而且这种结构不太好做分布式的集群方案。</td>
+</tr>
+</tbody></table>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lx-navigation">
+	<div class="lx-cover prev lx-cover-sm" style="background-image: url(/images/footer_1.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2020/01/13/大数据简介以及单机搭建/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Next</span>
+						<h3>大数据简介以及单机搭建</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+        <div class="lx-cover next lx-cover-sm" style="background-image: url(/images/footer_2.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2020/01/10/jenkins-svn-maven持续集成/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Prev</span>
+						<h3>jenkins+svn+maven持续集成</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+</div>
+<div class="comment"><div id="comments"></div></div>
+<footer>
+  <div>
+  Copyright &copy; 2019.<a href="/">Black eight</a><br><img src="http://dchip-web.z-chip.com/download/2020-07-24/16.37.38/%E5%A4%87%E6%A1%88%E5%9B%BE%E6%A0%87.png">京公网安备 11010802032453号<br>
+  </div>
+</footer>
+</div>
+<a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i></a>
+<div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Search..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+<button class="menu-trigger"></button>
+<div class="menu">
+  <div class="menu-head">
+    <span class="layer">
+      <div class="col">
+        <div class="row for-pic">
+          <div class="profile-pic">
+            <a href="/"><img src="/images/person_1.jpg" alt="WL"></a>
+          </div>
+        </div>
+        <div class="row for-name">
+          <p>WL</p>
+          <span class="tagline">Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride</span>
+        </div>
+      </div>
+    </span>
+  </div>
+  <nav class="menu-container">
+  <ul class="menu-items">
+    <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+    <li><a href="/archives/"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-bookmark fa-fw"></i>页面</span>
+        <ul>
+          <li><a href="/guestbook">留言</a></li>
+        <li><a href="/about">关于</a></li>
+        </ul>
+    </li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-link fa-fw"></i>友链</span>
+        <ul>
+          <li> <a href="https://lx.blleng.cn" target="_blank">Theme-Lx</a></li>
+        </ul>
+    </li>
+  </ul>
+  </nav>
+</div>
+
+<div class="gototop js-top">
+  <a href="#" class="js-gotop"><i class="fa fa-arrow-up"></i></a>
+</div>
+<script src="/js/jquery.easing.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.stellar.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/local.search.js"></script>
+<script src="//unpkg.com/valine"></script>
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YFLRL95mJxOLxyHI5EKXlr4Q-gzGzoHsz',
+    appKey: 'FO7iHJSy5vVqCIW3goFYWD5x',
+    placeholder: '此处留言',
+    avatar: 'identicon',
+    meta: guest,
+    pageSize: '10' || 10,
+    lang: 'zh-cn' || 'zh-cn'
+  });
+</script>
+
+</body>
+</html>

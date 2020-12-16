@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Mysql索引底层数据结构与算法 | Black eight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="WL">
+  <meta name="keywords" content>
+  <meta name="description" content="Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride">
+  <script id="hexo-configurations">
+  var CONFIG = {
+    root: '/',
+    theme: 'hexo-theme-lx',
+    version: '1.4.5',
+    localsearch:{
+      "enable": true,
+      "trigger": "auto",
+      "top_n_per_article": 1,
+      "unescape": false,
+      "preload": false
+      },
+    path: 'search.xml'
+  };
+</script>
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery.jside.menu.js"></script>
+	<script>
+	$(document).ready(function(){
+	$(".menu-container").jSideMenu({
+	    jSidePosition: "position-right",
+	    jSideSticky: true,
+	    jSideSkin: "endless-river",
+	     });
+	}); 
+	</script>
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300|Noto+Serif+SC&amp;display=swap">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+</head>
+<body>
+<div class="single">
+<div id="page">
+<div id="lx-aside" style="background-image: url(/images/page-cover.jpg)" data-stellar-background-ratio="0.5">
+  <div class="overlay">
+  <div class="page-title">
+    <div class="avatar"><a href="/"><img src="/images/person_1.jpg"></a></div>
+    <span>2019-10-08</span>
+    <h2>Mysql索引底层数据结构与算法</h2>
+    <div class="tags"><i class="fa fa-tag"></i><a class="tag-link" href="/tags/mysql/">mysql</a></div>
+    </div>
+</div>
+</div>
+<div id="lx-main-content">
+  <div class="lx-post">
+    <div class="lx-entry padding">
+      <div>
+        <h1 id="Mysql索引底层数据结构与算法"><a href="#Mysql索引底层数据结构与算法" class="headerlink" title="Mysql索引底层数据结构与算法"></a>Mysql索引底层数据结构与算法</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><p>数据结构：B+trees</p>
+<p>非叶子节点不存储data 只存储key</p>
+<p>叶子节点不存储指针</p>
+<p>Mysql的存储引擎</p>
+<p>MyISAM (非聚集索引)</p>
+<p>.frm  存储表结构</p>
+<p>.MYD  表数据</p>
+<p>.MYI    索引 b+trees</p>
+<h2 id="InnoDB-聚集索引-主键索引"><a href="#InnoDB-聚集索引-主键索引" class="headerlink" title="InnoDB(聚集索引 ==主键索引)"></a>InnoDB(聚集索引 ==主键索引)</h2><p>.frm表结构</p>
+<p>.ibd 索引+数据</p>
+<p>mysql 节点默认16k</p>
+<p>为什么InnDB表必须有主键，并且推荐使用整性的自增主键？</p>
+<p>使用UUID当做主键存在的问题：1.占用空间、效率低  UUID还需要转换为ascii码   2.UUID会造成数的撕裂、整型递增直接在后面追加   UUID不一定递增，会造成data分裂后在插入</p>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lx-navigation">
+	<div class="lx-cover prev lx-cover-sm" style="background-image: url(/images/footer_1.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2019/12/09/redis/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Next</span>
+						<h3>redis</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+        <div class="lx-cover next lx-cover-sm" style="background-image: url(/images/footer_2.jpg)">
+		<div class="overlay"></div>
+		<a class="copy" href="/2019/09/26/Base64Utils/">
+			<div class="display-t">
+				<div class="display-tc">
+					<div>
+						<span>Prev</span>
+						<h3>Base64Utils</h3>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+</div>
+<div class="comment"><div id="comments"></div></div>
+<footer>
+  <div>
+  Copyright &copy; 2019.<a href="/">Black eight</a><br><img src="http://dchip-web.z-chip.com/download/2020-07-24/16.37.38/%E5%A4%87%E6%A1%88%E5%9B%BE%E6%A0%87.png">京公网安备 11010802032453号<br>
+  </div>
+</footer>
+</div>
+<a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i></a>
+<div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Search..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+<button class="menu-trigger"></button>
+<div class="menu">
+  <div class="menu-head">
+    <span class="layer">
+      <div class="col">
+        <div class="row for-pic">
+          <div class="profile-pic">
+            <a href="/"><img src="/images/person_1.jpg" alt="WL"></a>
+          </div>
+        </div>
+        <div class="row for-name">
+          <p>WL</p>
+          <span class="tagline">Mr. Worldwide I just want to welcome everybody to my life It's heaven on earth but it's one hell of a ride</span>
+        </div>
+      </div>
+    </span>
+  </div>
+  <nav class="menu-container">
+  <ul class="menu-items">
+    <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+    <li><a href="/archives/"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-bookmark fa-fw"></i>页面</span>
+        <ul>
+          <li><a href="/guestbook">留言</a></li>
+        <li><a href="/about">关于</a></li>
+        </ul>
+    </li>
+    <li class="has-sub"><span class="dropdown-heading">
+      <i class="fa fa-link fa-fw"></i>友链</span>
+        <ul>
+          <li> <a href="https://lx.blleng.cn" target="_blank">Theme-Lx</a></li>
+        </ul>
+    </li>
+  </ul>
+  </nav>
+</div>
+
+<div class="gototop js-top">
+  <a href="#" class="js-gotop"><i class="fa fa-arrow-up"></i></a>
+</div>
+<script src="/js/jquery.easing.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.stellar.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/local.search.js"></script>
+<script src="//unpkg.com/valine"></script>
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YFLRL95mJxOLxyHI5EKXlr4Q-gzGzoHsz',
+    appKey: 'FO7iHJSy5vVqCIW3goFYWD5x',
+    placeholder: '此处留言',
+    avatar: 'identicon',
+    meta: guest,
+    pageSize: '10' || 10,
+    lang: 'zh-cn' || 'zh-cn'
+  });
+</script>
+
+</body>
+</html>
